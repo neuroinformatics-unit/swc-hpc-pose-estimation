@@ -1,0 +1,96 @@
+---
+title: Pose estimation with SLEAP
+subtitle: Applied HPC use example
+author: Niko Sirmpilatze
+format:
+    revealjs:
+        theme: [default, niu-light.scss]
+        logo: img/logo_niu_light.png
+        footer: "Introduction to HPC with Linux | 2023-05-15"
+        slide-number: c
+        menu:
+            numbers: true
+        chalkboard: true
+        scrollable: true
+        preview-links: false
+        view-distance: 10
+        mobile-view-distance: 10
+        auto-animate: true
+        auto-play-media: true
+        code-overflow: wrap
+        highlight-style: atom-one
+---
+
+## Tracking animals in videos {.smaller}
+
+![](img/tracking_types.png){height=500}
+
+::: aside
+From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
+:::
+
+## Pose estimation - 2D and 3D{.smaller}
+
+![](img/pose_estimation_2D_vs_3D.png){height=500}
+
+::: aside
+From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
+:::
+
+## Top-down vs bottom-up {.smaller}
+
+![](img/pose_estimation_topdown_vs_bottomup.png){height=500}
+
+::: aside
+From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
+:::
+## Pose estimation {.smaller}
+
+![](diagrams/pose-estimation.svg){fig-align=center width=900 height=300}
+
+#### Existing tools:
+
+* [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
+* [SLEAP](https://sleap.ai/)
+* Many others... (see [this list](https://hackmd.io/@i1EOuEktR1OzOa4jaySmKw/SkYCrE6Uj))
+
+## Where we can help {.smaller}
+
+#### Issues:
+
+* Training and inference steps are compute- and time-intensive
+* Most researchers do not use HPC, because its hard to set up
+
+::: {.fragment}
+#### Goals:
+
+* Keep `DeepLabCut` HPC module up-to-date and functioning
+* Consider adding a `SLEAP` HPC module
+* Provide `How To` documentation ([already working on this](https://hackmd.io/@i1EOuEktR1OzOa4jaySmKw/H1-UGHBDi))
+* Write and share convenience scripts, where necessary
+:::
+
+## `Deeplabcut` output
+
+| bodyparts	| head	| head	| head |
+| ---- | ---- | ---- | ---- |
+| **coords** | **x** | **y** | **likelihood** |
+| 0 | 891.6274	| 329.8043 | 0.9814 |
+| 1 | 898.9066	| 336.1953 | 0.9948 |
+| 2 | 908.2570	| 339.9593 | 0.9973 |
+| 3 | 918.3987	| 343.0952 | 0.9920 |
+| 4 | 929.2968	| 348.0225 | 0.9912 |
+| 5 | 940.5545	| 351.2606 | 0.9757 |
+
+## Acknowledgements {.smaller}
+
+Thanks to SWC researchers for sharing their time, expertise and data: 
+
+* Sepiedeh Keshavarzi 
+* Nicole Vissers
+* Loukia Katsouri
+* Jai Bhagat
+* Dario Campagner
+* Peter Vincent
+* Sanna Titus
+

@@ -1,0 +1,25 @@
+%%{init: {"theme": "neutral", "fontFamily": "arial", "curve": "linear"} }%%
+
+flowchart TB
+    classDef emphasis fill:#03A062;
+
+    subgraph videos["Processed videos"]
+    direction TB
+    video_1
+    video_2
+    video_x["video_..."]
+    video_n
+    end
+
+    subgraph pose["Pose estimation"]
+    direction LR
+
+    extract["extract frames"] -->split
+    split["train/test split"] --> label
+    label["label body parts"] --> train
+    train["train model"] --> evaluate["evaluate model"]
+    evaluate --> infer["infer body parts"]
+
+    end
+
+    videos --> pose
