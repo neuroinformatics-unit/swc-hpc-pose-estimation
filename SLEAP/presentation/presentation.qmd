@@ -32,36 +32,51 @@ format:
 
 ## Tracking animals in videos {.smaller}
 
-![](img/tracking_types.png){height=500}
+:::: {.columns}
 
-::: aside
-From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
+::: {.column width="60%"}
+![From: *Quantifying behavior to understand the brain, Nat Neuro 2020*](img/tracking_types.png){fig-align=center height=500}
 :::
 
-## Pose estimation - 2D and 3D{.smaller}
+::::
 
-![](img/pose_estimation_2D_vs_3D.png){height=500}
+## Pose estimation {.smaller}
 
-::: aside
-From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
-:::
+![From: *Quantifying behavior to understand the brain, Nat Neuro 2020*](img/pose_estimation_2D.png){.r-stretch fig-align=left}
 
 ## Top-down vs bottom-up {.smaller}
 
-![](img/pose_estimation_topdown_vs_bottomup.png){height=500}
+![From: *Quantifying behavior to understand the brain, Nat Neuro 2020*](img/pose_estimation_topdown_vs_bottomup.png){fig-align=left height=500}
+
+## Existing tools
+
+:::: {.columns}
+
+::: {.column width="35%"}
+- [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
+- [SLEAP](https://sleap.ai/)
+- [Many others](../../pose_estimation_tools.md):
+  - OpenPose
+  - DeepPoseKit
+  - Anipose
+  - Freipose
+  - ...
+:::
+
+::: {.column width="65%"}
+![](img/sleap_movie.gif)
+:::
+
+::::
+
+## SLEAP workflow
+
+
+![](diagrams/pose-estimation.svg){fig-align=center height=500}
 
 ::: aside
-From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
+training and inference are GPU-intensive
 :::
-## Pose estimation {.smaller}
-
-![](diagrams/pose-estimation.svg){fig-align=center width=900 height=300}
-
-#### Existing tools:
-
-* [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
-* [SLEAP](https://sleap.ai/)
-* Many others... (see [this list](https://hackmd.io/@i1EOuEktR1OzOa4jaySmKw/SkYCrE6Uj))
 
 ## Where we can help {.smaller}
 

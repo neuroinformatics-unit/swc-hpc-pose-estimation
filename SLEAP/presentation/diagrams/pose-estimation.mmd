@@ -1,25 +1,16 @@
 %%{init: {"theme": "neutral", "fontFamily": "arial", "curve": "linear"} }%%
 
-flowchart TB
+flowchart LR
     classDef emphasis fill:#03A062;
 
-    subgraph videos["Processed videos"]
-    direction TB
-    video_1
-    video_2
-    video_x["video_..."]
-    video_n
-    end
+    videos("videos\n 1,2,...,n")
+    videos -->|extract| frames("sampled\n frames")
+    frames -->|label\n body parts| labels("training\n dataset")
+    labels -->|train| model
+    model("model") -->|infer| predictions("predicted\n body parts")
+    predictions -.->|fix labels| labels
+    videos -->|unseeen data| model
 
-    subgraph pose["Pose estimation"]
-    direction LR
 
-    extract["extract frames"] -->split
-    split["train/test split"] --> label
-    label["label body parts"] --> train
-    train["train model"] --> evaluate["evaluate model"]
-    evaluate --> infer["infer body parts"]
-
-    end
-
-    videos --> pose
+    linkStyle 2 stroke:#03A062, color:;
+    linkStyle 3 stroke:#03A062, color:;

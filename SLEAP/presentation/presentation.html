@@ -40,11 +40,11 @@
 
   .callout {
     margin-top: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 1em;  
     border-radius: .25rem;
   }
 
-  .callout.callout-style-simple {
+  .callout.callout-style-simple { 
     padding: 0em 0.5em;
     border-left: solid #acacac .3rem;
     border-right: solid 1px silver;
@@ -95,7 +95,7 @@
     margin-top: 0.5em;
     margin-bottom: 0.5em;
   }
-
+    
   .callout.callout-captioned.callout-style-simple .callout-content  p {
     margin-top: 0;
   }
@@ -146,7 +146,7 @@
   .callout-caption {
     display: flex
   }
-
+    
   .callout-icon::before {
     margin-top: 1rem;
     padding-right: .5rem;
@@ -259,12 +259,12 @@
     }
     .reveal .footnotes ol {
       counter-reset: ol;
-      list-style-type: none;
+      list-style-type: none; 
       margin-left: 0;
     }
     .reveal .footnotes ol li:before {
       counter-increment: ol;
-      content: counter(ol) ". ";
+      content: counter(ol) ". "; 
     }
     .reveal .footnotes ol li > p:first-child {
       display: inline-block;
@@ -306,19 +306,19 @@
     .reveal .slide > img.r-stretch.quarto-figure-center {
       display: block;
       margin-left: auto;
-      margin-right: auto;
+      margin-right: auto; 
     }
     .reveal .slide > img.stretch.quarto-figure-left,
     .reveal .slide > img.r-stretch.quarto-figure-left  {
       display: block;
       margin-left: 0;
-      margin-right: auto;
+      margin-right: auto; 
     }
     .reveal .slide > img.stretch.quarto-figure-right,
     .reveal .slide > img.r-stretch.quarto-figure-right  {
       display: block;
       margin-left: auto;
-      margin-right: 0;
+      margin-right: 0; 
     }
   </style>
 </head>
@@ -333,7 +333,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-Niko Sirmpilatze
+Niko Sirmpilatze 
 </div>
 </div>
 </div>
@@ -354,39 +354,62 @@ Niko Sirmpilatze
 </section>
 <section id="tracking-animals-in-videos" class="slide level2 smaller">
 <h2>Tracking animals in videos</h2>
-<p><img data-src="img/tracking_types.png" height="500"></p>
-
-<aside><div>
-<p>From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></p>
-</div></aside></section>
-<section id="pose-estimation---2d-and-3d" class="slide level2 smaller">
-<h2>Pose estimation - 2D and 3D</h2>
-<p><img data-src="img/pose_estimation_2D_vs_3D.png" height="500"></p>
-
-<aside><div>
-<p>From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></p>
-</div></aside></section>
-<section id="top-down-vs-bottom-up" class="slide level2 smaller">
-<h2>Top-down vs bottom-up</h2>
-<p><img data-src="img/pose_estimation_topdown_vs_bottomup.png" height="500"></p>
-
-<aside><div>
-<p>From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></p>
-</div></aside></section>
-<section id="pose-estimation" class="slide level2 smaller">
-<h2>Pose estimation</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
 <div class="quarto-figure quarto-figure-center">
 <figure>
-<p><img data-src="diagrams/pose-estimation.svg" width="900" height="300"></p>
+<p><img data-src="img/tracking_types.png" height="500"></p>
+<p></p><figcaption>From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></figcaption><p></p>
 </figure>
 </div>
-<h4 id="existing-tools">Existing tools:</h4>
+</div>
+</div>
+</section>
+<section id="pose-estimation" class="slide level2 smaller">
+<h2>Pose estimation</h2>
+
+<img data-src="img/pose_estimation_2D.png" class="r-stretch quarto-figure-left"><p class="caption">From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></p></section>
+<section id="top-down-vs-bottom-up" class="slide level2 smaller">
+<h2>Top-down vs bottom-up</h2>
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><img data-src="img/pose_estimation_topdown_vs_bottomup.png" height="500"></p>
+<p></p><figcaption>From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></figcaption><p></p>
+</figure>
+</div>
+</section>
+<section id="existing-tools" class="slide level2">
+<h2>Existing tools</h2>
+<div class="columns">
+<div class="column" style="width:35%;">
 <ul>
 <li><a href="http://www.mackenziemathislab.org/deeplabcut">DeepLabCut</a></li>
 <li><a href="https://sleap.ai/">SLEAP</a></li>
-<li>Many others… (see <a href="https://hackmd.io/@i1EOuEktR1OzOa4jaySmKw/SkYCrE6Uj">this list</a>)</li>
+<li><a href="../../pose_estimation_tools.md">Many others</a>:
+<ul>
+<li>OpenPose</li>
+<li>DeepPoseKit</li>
+<li>Anipose</li>
+<li>Freipose</li>
+<li>…</li>
+</ul></li>
 </ul>
+</div><div class="column" style="width:65%;">
+<p><img data-src="img/sleap_movie.gif"></p>
+</div>
+</div>
 </section>
+<section id="sleap-workflow" class="slide level2">
+<h2>SLEAP workflow</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="diagrams/pose-estimation.svg" height="500"></p>
+</figure>
+</div>
+
+<aside><div>
+<p>training and inference are GPU-intensive</p>
+</div></aside></section>
 <section id="where-we-can-help" class="slide level2 smaller">
 <h2>Where we can help</h2>
 <h4 id="issues">Issues:</h4>
@@ -491,7 +514,7 @@ Niko Sirmpilatze
   <script src="presentation_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
   <script src="presentation_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
   <script src="presentation_files/libs/revealjs/plugin/quarto-support/support.js"></script>
-
+  
 
   <script src="presentation_files/libs/revealjs/plugin/notes/notes.js"></script>
   <script src="presentation_files/libs/revealjs/plugin/search/search.js"></script>
@@ -514,7 +537,7 @@ Niko Sirmpilatze
 'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true,"numbers":true},
 'chalkboard': {"buttons":true},
 'smaller': false,
-
+ 
         // Display controls in the bottom right corner
         controls: false,
 
@@ -711,7 +734,7 @@ Niko Sirmpilatze
           toggleBodyColorMode(bsSheetEl);
         }
       }
-      toggleBodyColorPrimary();
+      toggleBodyColorPrimary();  
       const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
       tabsets.forEach(function(tabset) {
         const tabby = new Tabby('#' + tabset.id);
@@ -735,11 +758,11 @@ Niko Sirmpilatze
           button.setAttribute("data-bs-toggle", "tooltip");
           button.setAttribute("data-bs-placement", "left");
           button.setAttribute("data-bs-title", "Copied!");
-          tooltip = new bootstrap.Tooltip(button,
-            { trigger: "manual",
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
               customClass: "code-copy-button-tooltip",
               offset: [0, -8]});
-          tooltip.show();
+          tooltip.show();    
         }
         setTimeout(function() {
           if (tooltip) {
@@ -771,7 +794,7 @@ Niko Sirmpilatze
         };
           config['offset'] = [0,0];
           config['maxWidth'] = 700;
-        window.tippy(el, config);
+        window.tippy(el, config); 
       }
       const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
       for (var i=0; i<noterefs.length; i++) {
@@ -824,6 +847,6 @@ Niko Sirmpilatze
       }
     });
     </script>
-
+    
 
 </body></html>
