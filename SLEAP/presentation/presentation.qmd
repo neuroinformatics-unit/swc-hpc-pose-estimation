@@ -21,6 +21,15 @@ format:
         highlight-style: atom-one
 ---
 
+## Outline
+
+::: {.incremental}
+- Pose estimation primer
+- SLEAP pipeline showcase
+  - Running a single training job on HPC
+  - Batching multiple jobs
+:::
+
 ## Tracking animals in videos {.smaller}
 
 ![](img/tracking_types.png){height=500}
@@ -84,13 +93,12 @@ From: *Quantifying behavior to understand the brain, Nat Neuro 2020*
 
 ## Acknowledgements {.smaller}
 
-Thanks to SWC researchers for sharing their time, expertise and data: 
+Thanks to SWC researchers for sharing their time, expertise and data:
 
-* Sepiedeh Keshavarzi 
+* Sepiedeh Keshavarzi
 * Nicole Vissers
 * Loukia Katsouri
 * Jai Bhagat
 * Dario Campagner
 * Peter Vincent
 * Sanna Titus
-
