@@ -51,7 +51,7 @@ format:
 ::: {.column width="35%"}
 - [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
 - [SLEAP](https://sleap.ai/)
-- [Many others](../../pose_estimation_tools.md):
+- Many others:
   - OpenPose
   - DeepPoseKit
   - Anipose
@@ -67,7 +67,7 @@ format:
 
 ## SLEAP workflow
 
-![](diagrams/pose-estimation.svg){fig-align=center height=300}
+![](diagrams/pose-estimation.svg){fig-align=center height=150}
 
 ::: {.fragment}
 - training and inference are GPU-intensive
@@ -148,5 +148,5 @@ bash train-script.sh
 
 * Loukia Katsouri (mouse videos)
 * Chang Huan Lo (example SLEAP code)
-* Alen Martin (setting up HPC modules)
+* Alex Martin (setting up HPC modules)
 * Sofia Minano and Laura Schwarz (testing)
