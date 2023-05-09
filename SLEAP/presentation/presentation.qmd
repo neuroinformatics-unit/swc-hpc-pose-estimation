@@ -191,7 +191,7 @@ Useful for submitting many similar jobs
 :::
 
 
-## Batch script {.smaller}
+## Compose batch script {.smaller}
 
 ```{.bash}
 # Clone the GitHub repository
@@ -227,6 +227,30 @@ cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data/labels.v001.slp.tr
 bash train-script.sh
 ```
 :::
+
+## Submit and monitor batch script {.smaller}
+
+```{.bash code-line-numbers="1-3|5-9|10-16|17-19"}
+# Submit job
+$ sbatch swc-hpc-pose-estimation/SLEAP/slurm_batch_script.sh
+Submitted batch job 3445652
+
+# View status of queued/running jobs
+$ squeue -u <SWC-USERNAME>
+JOBID    PARTITION  NAME     USER      ST  TIME   NODES  NODELIST(REASON)
+3445652  gpu        slurm_ba sirmpila  R   23:11  1      gpu-sr670-20
+
+# View status of running/completed jobs
+$ sacct -u <SWC-USERNAME>
+JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
+------------ ---------- ---------- ---------- ---------- ---------- -------- 
+3445652      slurm_bat+        gpu     swc-ac          2    RUNNING      0:0 
+3445652.bat+      batch                swc-ac          2    RUNNING      0:0
+
+# View the contents of standard output and error
+$ cat slurm.gpu-sr670-20.3445652.out
+$ cat slurm.gpu-sr670-20.3445652.err
+```
 
 ## Useful links {.smaller}
 

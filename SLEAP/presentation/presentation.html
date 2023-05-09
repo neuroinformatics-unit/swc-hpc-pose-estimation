@@ -327,8 +327,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </section>
-<section id="batch-script" class="level2 smaller">
-<h2 class="smaller anchored" data-anchor-id="batch-script">Batch script</h2>
+<section id="compose-batch-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="compose-batch-script">Compose batch script</h2>
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone the GitHub repository</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -363,6 +363,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </section>
+<section id="submit-and-monitor-batch-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="submit-and-monitor-batch-script">Submit and monitor batch script</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Submit job</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="ex">$</span> sbatch swc-hpc-pose-estimation/SLEAP/slurm_batch_script.sh</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="ex">Submitted</span> batch job 3445652</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co"># View status of queued/running jobs</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="ex">$</span> squeue <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="ex">JOBID</span>    PARTITION  NAME     USER      ST  TIME   NODES  NODELIST<span class="er">(</span><span class="ex">REASON</span><span class="kw">)</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="ex">3445652</span>  gpu        slurm_ba sirmpila  R   23:11  1      gpu-sr670-20</span>
+<span id="cb10-9"><a href="#cb10-9"></a></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co"># View status of running/completed jobs</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="ex">$</span> sacct <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="ex">JobID</span>           JobName  Partition    Account  AllocCPUS      State ExitCode </span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="ex">------------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">--------</span> </span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="ex">3445652</span>      slurm_bat+        gpu     swc-ac          2    RUNNING      0:0 </span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="ex">3445652.bat+</span>      batch                swc-ac          2    RUNNING      0:0</span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co"># View the contents of standard output and error</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="ex">$</span> cat slurm.gpu-sr670-20.3445652.out</span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="ex">$</span> cat slurm.gpu-sr670-20.3445652.err</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
 <section id="useful-links" class="level2 smaller">
 <h2 class="smaller anchored" data-anchor-id="useful-links">Useful links</h2>
 <section id="pose-estimation-1" class="level4">
@@ -387,7 +409,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="smaller anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
 <ul>
 <li>Loukia Katsouri (mouse videos)</li>
-<li>Chang Huan Lo (example SLEAP code)</li>
+<li>Chang Huan Lo (SLEAP Python code)</li>
 <li>Alex Martin (setting up HPC modules)</li>
 <li>Sofia Minano and Laura Schwarz (testing)</li>
 </ul>
