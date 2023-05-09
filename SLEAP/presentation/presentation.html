@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.335">
+<meta name="generator" content="quarto-1.2.267">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -131,18 +131,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<section id="outline" class="level2">
-<h2 class="anchored" data-anchor-id="outline">Outline</h2>
-<div class="incremental">
-<ul class="incremental">
-<li>Pose estimation primer</li>
-<li>SLEAP pipeline showcase
-<ul class="incremental">
-<li>Running a single training job on HPC</li>
-<li>Batching multiple jobs</li>
-</ul></li>
+<section id="course-materials" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="course-materials">Course materials</h2>
+<section id="sample-data" class="level4">
+<h4 class="anchored" data-anchor-id="sample-data">Sample data</h4>
+<p><code>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</code></p>
+<ul>
+<li>Mouse video (from <a href="https://www.sainsburywellcome.org/web/people/loukia-katsouri">Loukia Katsouri</a>)</li>
+<li>SLEAP project with labelled data</li>
 </ul>
-</div>
+</section>
+<section id="github-repository" class="level4">
+<h4 class="anchored" data-anchor-id="github-repository">Github repository</h4>
+<p><a href="https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation">github.com/neuroinformatics-unit/swc-hpc-pose-estimation</a></p>
+<ul>
+<li>This presentation</li>
+<li>Example scripts</li>
+</ul>
+</section>
 </section>
 <section id="tracking-animals-in-videos" class="level2 smaller">
 <h2 class="smaller anchored" data-anchor-id="tracking-animals-in-videos">Tracking animals in videos</h2>
@@ -151,7 +157,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="img/tracking_types.png" height="500" class="figure-img"></p>
-<p></p><figcaption class="figure-caption">From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></figcaption><p></p>
+<p></p><figcaption class="figure-caption">source: <a href="https://doi.org/10.1038/s41593-020-00734-z">doi.org/10.1038/s41593-020-00734-z</a></figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -164,7 +170,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <figure class="figure">
 <img src="img/pose_estimation_2D.png" class="r-stretch img-fluid figure-img">
 </figure>
-<p></p><figcaption class="figure-caption">From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></figcaption><p></p>
+<p></p><figcaption class="figure-caption">source: <a href="https://doi.org/10.1038/s41593-020-00734-z">doi.org/10.1038/s41593-020-00734-z</a></figcaption><p></p>
 </figure>
 </div>
 </section>
@@ -175,7 +181,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><a href="http://www.mackenziemathislab.org/deeplabcut">DeepLabCut</a></li>
 <li><a href="https://sleap.ai/">SLEAP</a></li>
-<li><a href="../../pose_estimation_tools.md">Many others</a>:
+<li>Many others:
 <ul>
 <li>OpenPose</li>
 <li>DeepPoseKit</li>
@@ -198,75 +204,184 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <div class="fragment">
 <ul>
-<li>training and inference are GPU-intensive</li>
-<li>we can delegate to the HPC cluster’s GPU nodes</li>
+<li>Training and inference are GPU-intensive</li>
+<li>We can delegate to the HPC cluster’s GPU nodes</li>
 </ul>
 </div>
+</section>
+<section id="label-body-parts" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="label-body-parts">Label body parts</h2>
+<ul>
+<li>Annotate frames using the <code>sleap-label</code> GUI on your PC/laptop</li>
+<li>Save project (e.g.&nbsp;<code>labels.v001.slp</code>)</li>
+</ul>
+<p><img src="img/sleap-label_screenshot.png" class="img-fluid"></p>
+</section>
+<section id="configure-training" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="configure-training">Configure training</h2>
+<ul>
+<li>In the <code>sleap-label</code> GUI: <code>Predict/Run Training...</code></li>
+</ul>
+<p><img src="img/sleap-train_config.png" class="img-fluid"></p>
+<ul>
+<li>When ready, <code>Export training job package...</code></li>
+</ul>
+</section>
+<section id="training-job-package-contents" class="level2">
+<h2 class="anchored" data-anchor-id="training-job-package-contents">Training job package contents</h2>
+<p><code>labels.v001.slp.training_job.zip</code> =&gt; unzip</p>
+<div class="sourceCode" id="cb1" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy of labelled frames</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">labels.v001.pkg.slp</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Model configuration files</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">centroid.json</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">centered_instance.json</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Bash scripts for running training and inference</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">train_script.sh</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">inference_script.sh</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary of all jobs</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">jobs.yaml</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="top-down-vs-bottom-up" class="level2 smaller">
 <h2 class="smaller anchored" data-anchor-id="top-down-vs-bottom-up">Top-down vs bottom-up</h2>
 <div class="quarto-figure quarto-figure-left">
 <figure class="figure">
-<p><img src="img/pose_estimation_topdown_vs_bottomup.png" height="500" class="figure-img"></p>
-<p></p><figcaption class="figure-caption">From: <em>Quantifying behavior to understand the brain, Nat Neuro 2020</em></figcaption><p></p>
+<p><img src="img/pose_estimation_topdown.png" height="220" class="figure-img"></p>
 </figure>
+</div>
+<div class="incremental">
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="img/pose_estimation_bottomup.png" height="220" class="figure-img"></p>
+<p></p><figcaption class="figure-caption">source: <a href="https://doi.org/10.1038/s41593-020-00734-z">doi.org/10.1038/s41593-020-00734-z</a></figcaption><p></p>
+</figure>
+</div>
 </div>
 </section>
 <section id="finding-our-project-on-the-hpc" class="level2">
 <h2 class="anchored" data-anchor-id="finding-our-project-on-the-hpc">Finding our project on the HPC</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># Logging into the HPC cluster</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">ssh</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span>@ssh.swc.ucl.ac.uk <span class="co"># Provide password</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">ssh</span> hpc-gw1 <span class="co"># Provide password again</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="co"># Navigate to your SLEAP project</span></span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="bu">cd</span> /ceph/neuroinformatics/neuroinformatics/sirmpilatzen/SLEAP_tutorial</span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="co"># Check the contents of your folder</span></span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">ls</span> <span class="at">-l</span></span>
-<span id="cb1-9"><a href="#cb1-9"></a></span>
-<span id="cb1-10"><a href="#cb1-10"></a><span class="co"># Go inside the exported training package</span></span>
-<span id="cb1-11"><a href="#cb1-11"></a><span class="bu">cd</span> labels.v002.slp.training_job</span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="fu">ls</span> <span class="at">-l</span></span>
-<span id="cb1-13"><a href="#cb1-13"></a></span>
-<span id="cb1-14"><a href="#cb1-14"></a><span class="co"># View the contents of train-script.sh</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a><span class="fu">cat</span> train-script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Logging into the HPC cluster</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ssh</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span>@ssh.swc.ucl.ac.uk <span class="co"># Provide password</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">ssh</span> hpc-gw1 <span class="co"># Provide password again</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co"># Navigate to your SLEAP project</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="bu">cd</span> /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># Check the contents of your folder</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">ls</span> <span class="at">-l</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co"># Go inside the exported training package</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="bu">cd</span> labels.v001.slp.training_job</span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="fu">ls</span> <span class="at">-l</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co"># View the contents of train-script.sh</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="fu">cat</span> train-script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
-<p><code>train-script.sh</code></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sleap-train</span> centroid.json labels.v002.pkg.slp</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sleap-train</span> centered_instance.json labels.v002.pkg.slp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>train-script.sh</strong></pre>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sleap-train</span> centroid.json labels.v001.pkg.slp</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sleap-train</span> centered_instance.json labels.v001.pkg.slp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 </section>
-<section id="get-the-code" class="level2 smaller">
-<h2 class="smaller anchored" data-anchor-id="get-the-code">Get the code</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone the GitHub repository</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View the contenrs of the SLURM script</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> swc-hpc-pose-estimation/SLEAP/slurm_batch_script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="fragment">
-<p><code>slurm_batch_script.sh</code></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1"></a><span class="co">#!/bin/bash</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
-<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
-<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
-<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#SBATCH -t 0-06:00 # time (D-HH:MM)</span></span>
-<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#SBATCH --gres gpu:1 # request 1 GPU (of any kind)</span></span>
-<span id="cb4-9"><a href="#cb4-9"></a><span class="co">#SBATCH -o slurm_output.out</span></span>
-<span id="cb4-10"><a href="#cb4-10"></a><span class="co">#SBATCH -e slurm_error.err</span></span>
-<span id="cb4-11"><a href="#cb4-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
-<span id="cb4-12"><a href="#cb4-12"></a><span class="co">#SBATCH --mail-user=ucqfnsi@ucl.ac.uk</span></span>
-<span id="cb4-13"><a href="#cb4-13"></a></span>
-<span id="cb4-14"><a href="#cb4-14"></a><span class="co"># Load the SLEAP module</span></span>
-<span id="cb4-15"><a href="#cb4-15"></a><span class="ex">module</span> load SLEAP</span>
-<span id="cb4-16"><a href="#cb4-16"></a></span>
-<span id="cb4-17"><a href="#cb4-17"></a><span class="co"># Go to the training job directory</span></span>
-<span id="cb4-18"><a href="#cb4-18"></a><span class="bu">cd</span> /ceph/neuroinformatics/neuroinformatics/sirmpilatzen/SLEAP_tutorial/labels.v002.slp.training_job</span>
-<span id="cb4-19"><a href="#cb4-19"></a></span>
-<span id="cb4-20"><a href="#cb4-20"></a><span class="co"># Run the training script generated by SLEAP</span></span>
-<span id="cb4-21"><a href="#cb4-21"></a><span class="fu">bash</span> train-script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="get-slurm-to-run-the-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="get-slurm-to-run-the-script">Get SLURM to run the script</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Interactive</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Batch</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Array batch</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Suitable for debugging (immediate feedback)</p>
+<ul>
+<li><p>Start an interactive job with one GPU</p>
+<div class="sourceCode" id="cb4" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">-p</span> gpu <span class="at">--gres</span><span class="op">=</span>gpu:1 <span class="at">--pty</span> bash <span class="at">-i</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Execute commands one-by-one, e.g.:</p>
+<div class="sourceCode" id="cb5" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="op">&lt;</span>MY-TRAINING-DIRECTORY<span class="op">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> train-script.sh</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop the session</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
 </div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Main method for submitting jobs</p>
+<ul>
+<li><p>Prepare a batch script, e.g.&nbsp;<code>run_sleap_training.sh</code></p></li>
+<li><p>Submit the job:</p>
+<div class="sourceCode" id="cb6" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> run_sleap_training.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Monitor job status:</p>
+<div class="sourceCode" id="cb7" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Useful for submitting many similar jobs</p>
+<ul>
+<li>Write a batch script</li>
+<li>Execute the script over an array of inputs in parallel</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="batch-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="batch-script">Batch script</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone the GitHub repository</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View the contenrs of the SLURM script</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> swc-hpc-pose-estimation/SLEAP/slurm_batch_script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>slurm_batch_script.sh</strong></pre>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#SBATCH -t 0-06:00 # time (D-HH:MM)</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#SBATCH --gres gpu:1 # request 1 GPU (of any kind)</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#SBATCH -o slurm.%N.%j.out # STDOUT</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#SBATCH -e slurm.%N.%j.err # STDERR</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#SBATCH --mail-user=ucqfnsi@ucl.ac.uk</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co"># Load the SLEAP module</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb9-16"><a href="#cb9-16"></a></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co"># Go to the training job directory</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="bu">cd</span> /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data/labels.v001.slp.training_job</span>
+<span id="cb9-19"><a href="#cb9-19"></a></span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="co"># Run the training script generated by SLEAP</span></span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="fu">bash</span> train-script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="useful-links" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="useful-links">Useful links</h2>
+<section id="pose-estimation-1" class="level4">
+<h4 class="anchored" data-anchor-id="pose-estimation-1">Pose estimation</h4>
+<ul>
+<li><a href="https://doi.org/10.1038/s41593-020-00734-z">Quantifying behavior to understand the brain</a></li>
+<li><a href="http://www.mackenziemathislab.org/deeplabcut">DeepLabCut</a></li>
+<li><a href="https://sleap.ai/">SLEAP</a></li>
+</ul>
+</section>
+<section id="swc-wiki" class="level4">
+<h4 class="anchored" data-anchor-id="swc-wiki">SWC wiki</h4>
+<ul>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/Overview+of+SLURM+job+scheduler">Overview of SLURM job scheduler</a></li>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/Logging+into+the+Cluster">Logging into the Cluster</a></li>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture">CPU and GPU Platform Architecture</a></li>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/Linux+Environment+Modules">Linux Environment Modules</a></li>
+</ul>
+</section>
 </section>
 <section id="acknowledgements" class="level2 smaller">
 <h2 class="smaller anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
