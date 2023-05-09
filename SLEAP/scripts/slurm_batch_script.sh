@@ -6,8 +6,8 @@
 #SBATCH -n 2 # number of cores
 #SBATCH -t 0-06:00 # time (D-HH:MM)
 #SBATCH --gres gpu:1 # request 1 GPU (of any kind)
-#SBATCH -o slurm_output.out
-#SBATCH -e slurm_error.err
+#SBATCH -o slurm.%N.%j.out # STDOUT
+#SBATCH -e slurm.%N.%j.err # STDERR
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=ucqfnsi@ucl.ac.uk
 
