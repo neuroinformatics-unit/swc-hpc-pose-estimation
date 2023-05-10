@@ -9,7 +9,7 @@
 #SBATCH -o slurm.%N.%j.out # STDOUT
 #SBATCH -e slurm.%N.%j.err # STDERR
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ucqfnsi@ucl.ac.uk
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
 
 # Load the SLEAP module
 module load SLEAP

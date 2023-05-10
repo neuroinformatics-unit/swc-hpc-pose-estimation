@@ -9,16 +9,14 @@
 #SBATCH -o slurm.%N.%j.out # STDOUT
 #SBATCH -e slurm.%N.%j.err # STDERR
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=ucqfnsi@ucl.ac.uk
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
 
 # Load the SLEAP module
 module load SLEAP
 
-# Define data directory
+# Define directories for data and exported training job
 DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
-# Define exported job directory
 JOB_DIR=$DATA_DIR/labels.v001.slp.training_job
-
 # Go to the job directory
 cd $JOB_DIR
 
