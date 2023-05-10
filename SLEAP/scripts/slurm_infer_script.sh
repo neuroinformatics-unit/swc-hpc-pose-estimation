@@ -31,3 +31,12 @@ sleap-track $DATA_DIR/videos/M708149_EPM_20200317_165049331-converted.mp4 \
     -o labels.v001.slp.predictions.slp \
     --verbosity json \
     --no-empty-frames
+
+# The above command will run inference on the entire video
+# If you wish it to run only on some frames,
+# you can add the --frames argument, e.g.:
+# --frames 1-50
+# --frames 1,100,200,300,400
+
+# You can see the meaining of the command line arguments by running:
+# sleap-track --help
