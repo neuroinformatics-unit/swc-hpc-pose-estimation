@@ -165,3 +165,7 @@ _extensions/
 
 # Mac OS
 .DS_Store
+
+# slurm standard output and error files
+slurm*.out
+slurm*.err
