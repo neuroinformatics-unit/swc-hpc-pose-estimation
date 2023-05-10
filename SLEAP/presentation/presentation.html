@@ -199,7 +199,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="sleap-workflow">SLEAP workflow</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="diagrams/pose-estimation.svg" height="150" class="figure-img"></p>
+<p><img src="diagrams/pose-estimation.svg" class="img-fluid figure-img" width="600"></p>
 </figure>
 </div>
 <div class="fragment">
@@ -332,7 +332,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone the GitHub repository</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View the contenrs of the SLURM script</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View the contents of the SLURM script</span></span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span> swc-hpc-pose-estimation/SLEAP/slurm_batch_script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <div class="code-with-filename">
@@ -378,8 +378,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-11"><a href="#cb10-11"></a><span class="ex">$</span> sacct <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span>
 <span id="cb10-12"><a href="#cb10-12"></a><span class="ex">JobID</span>           JobName  Partition    Account  AllocCPUS      State ExitCode </span>
 <span id="cb10-13"><a href="#cb10-13"></a><span class="ex">------------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">--------</span> </span>
-<span id="cb10-14"><a href="#cb10-14"></a><span class="ex">3445652</span>      slurm_bat+        gpu     swc-ac          2    RUNNING      0:0 </span>
-<span id="cb10-15"><a href="#cb10-15"></a><span class="ex">3445652.bat+</span>      batch                swc-ac          2    RUNNING      0:0</span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="ex">3445652</span>      slurm_bat+        gpu     swc-ac          2  COMPLETED      0:0 </span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="ex">3445652.bat+</span>      batch                swc-ac          2  COMPLETED      0:0</span>
 <span id="cb10-16"><a href="#cb10-16"></a></span>
 <span id="cb10-17"><a href="#cb10-17"></a><span class="co"># View the contents of standard output and error</span></span>
 <span id="cb10-18"><a href="#cb10-18"></a><span class="ex">$</span> cat slurm.gpu-sr670-20.3445652.out</span>

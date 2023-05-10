@@ -71,7 +71,7 @@ format:
 
 ## SLEAP workflow
 
-![](diagrams/pose-estimation.svg){fig-align=center height=150}
+![](diagrams/pose-estimation.svg){fig-align=center width=600}
 
 ::: {.fragment}
 - Training and inference are GPU-intensive
@@ -197,7 +197,7 @@ Useful for submitting many similar jobs
 # Clone the GitHub repository
 git clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git
 
-# View the contenrs of the SLURM script
+# View the contents of the SLURM script
 cat swc-hpc-pose-estimation/SLEAP/slurm_batch_script.sh
 ```
 
@@ -244,8 +244,8 @@ JOBID    PARTITION  NAME     USER      ST  TIME   NODES  NODELIST(REASON)
 $ sacct -u <SWC-USERNAME>
 JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
 ------------ ---------- ---------- ---------- ---------- ---------- -------- 
-3445652      slurm_bat+        gpu     swc-ac          2    RUNNING      0:0 
-3445652.bat+      batch                swc-ac          2    RUNNING      0:0
+3445652      slurm_bat+        gpu     swc-ac          2  COMPLETED      0:0 
+3445652.bat+      batch                swc-ac          2  COMPLETED      0:0
 
 # View the contents of standard output and error
 $ cat slurm.gpu-sr670-20.3445652.out
