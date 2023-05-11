@@ -740,7 +740,19 @@ Niko Sirmpilatze
 <span id="cb13-11"><a href="#cb13-11"></a><span class="ex">train-script.sh</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="fragment">
 <ul>
-<li>Open the predictions with the <code>sleap-label</code> GUI on your PC/laptop</li>
+<li>Inspect the predictions with the <code>sleap-label</code> GUI on your PC/laptop</li>
+</ul>
+</div>
+</section>
+<section id="the-training---inference-cycle" class="slide level2">
+<h2>The training - inference cycle</h2>
+<div>
+<ul>
+<li class="fragment">Correct some of the predictions: see <a href="https://sleap.ai/tutorials/assisted-labeling.html">Prediction-assisted labeling</a></li>
+<li class="fragment">Merge corrected labels into the initial training set: see <a href="https://sleap.ai/guides/merging.html">Merging guide</a></li>
+<li class="fragment">Save the merged training set as<code>labels.v002.slp</code></li>
+<li class="fragment">Export a new training job <code>labels.v002.slp.training_job</code> (you may reuse the training configurations from <code>v001</code>)</li>
+<li class="fragment">Repeat the training-inference cycle until satisfied</li>
 </ul>
 </div>
 </section>

@@ -345,7 +345,17 @@ train-script.sh
 ```
 
 ::: {.fragment}
-- Open the predictions with the `sleap-label` GUI on your PC/laptop
+- Inspect the predictions with the `sleap-label` GUI on your PC/laptop
+:::
+
+## The training - inference cycle
+
+::: {.incremental}
+- Correct some of the predictions: see [Prediction-assisted labeling](https://sleap.ai/tutorials/assisted-labeling.html)
+- Merge corrected labels into the initial training set: see [Merging guide](https://sleap.ai/guides/merging.html)
+- Save the merged training set as`labels.v002.slp`
+- Export a new training job `labels.v002.slp.training_job` (you may reuse the training configurations from `v001`)
+- Repeat the training-inference cycle until satisfied
 :::
 
 ## Useful links {.smaller}
