@@ -264,6 +264,66 @@ The SLEAP GUI on your local machine can be used to quickly evaluate the trained 
 - You can view the basic metrics on the shown table or you can also view a more detailed report (including plots) by clicking "View Metrics".
 
 ## Model inference
-By inference, we mean using a trained model to predict the labels on new frames/videos.
+By inference, we mean using a trained model to predict the labels on new frames/videos. SLEAP provides the `sleap-track` command line utility for running inference on a single video or a folder of videos.
 
+Below is an example SLURM batch script that contains a `sleap-track` call.
+```bash
+#!/bin/bash 
+
+#SBATCH -p gpu # partition
+#SBATCH -N 1   # number of nodes
+#SBATCH --mem 12G # memory pool for all cores
+#SBATCH -n 2 # number of cores
+#SBATCH -t 0-01:00 # time (D-HH:MM)
+#SBATCH --gres gpu:1 # request 1 GPU (of any kind)
+#SBATCH -o slurm.%N.%j.out # write STDOUT
+#SBATCH -e slurm.%N.%j.err # write STDERR
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk  
+
+# Load the SLEAP module
+module load SLEAP
+
+# Define directories for data and exported training job
+DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+JOB_DIR=$DATA_DIR/labels.v001.slp.training_job
+# Go to the job directory
+cd $JOB_DIR 
+
+# Run the inference command
+sleap-track $DATA_DIR/videos/M708149_EPM_20200317_165049331-converted.mp4 \
+    -m $JOB_DIR/models/230509_141357.centroid/training_config.json \
+    -m $JOB_DIR/models/230509_141357.centered_instance/training_config.json \
+    --gpu auto \
+    --tracking.tracker none \
+    -o labels.v001.slp.predictions.slp \
+    --verbosity json \
+    --no-empty-frames
+```
+The script is very similar to the training script, with the following differences:
+- The time limit `-t` is set lower, since inference is normally faster than training. This will however depend on the size of the video and the number of models used.
+- The `./train-script.sh` line is replaced by the `sleap-track` command. Some important command line arguments are explained below. You can view a full list of the available arguments by running `sleap-track --help`.
+  - The first argument is the path to the video file to be processed.
+  - The `-m` option is used to specify the path to the model configuration file(s) to be used for inference. In this example we use the two models that were trained above.
+  - The `--gpu` option is used to specify the GPU to be used for inference. The `auto` value will automatically select the GPU with the highes percentage of available memory (of the GPUs that are available on the machine/node)
+  - The `--tracking.tracker` option is used to specify the tracker for inference. Since in this example we only have one animal, we set it to "none".
+  - The `-o` option is used to specify the path to the output file containing the predictions.
+  - The above script will predict all the frames in the video. You may select specific frames via the `--frames` option. For example: `--frames 1-50` or `--frames 1,3,5,7,9`.
+
+You can submit and monitor the inference job in the same as the training job.
+```bash
+$ sbatch slurm_infer_script.sh
+$ squeue -u <SWC-USERNAME>
+```
+Upon completion, a `labels.v001.slp.predictions.slp` file will have been created in the job directory. 
+
+You can use the SLEAP GUI on your local machine to load and view the predictions: "File" -> "Open Project..." -> select the `labels.v001.slp.predictions.slp` file.
+
+## The training-inference cycle
+Now that you have some predictions, you can keep improving your models by repeating the training-inference cycle. The basic steps are:
+- Manually correct some of the predictions: see [Prediction-assisted labeling](https://sleap.ai/tutorials/assisted-labeling.html)
+- Merge corrected labels into the initial training set: see [Merging guide](https://sleap.ai/guides/merging.html)
+- Save the merged training set as`labels.v002.slp`
+- Export a new training job `labels.v002.slp.training_job` (you may reuse the training configurations from `v001`)
+- Repeat the training-inference cycle until satisfied
 

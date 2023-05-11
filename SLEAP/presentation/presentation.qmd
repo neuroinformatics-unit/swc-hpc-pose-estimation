@@ -74,8 +74,9 @@ format:
 
 ## SLEAP workflow
 
-![](diagrams/pose-estimation.svg){fig-align=center width=600}
-
+```{mermaid}
+%%| file: diagrams/pose-estimation.mmd
+```
 ::: {.fragment}
 - Training and inference are GPU-intensive
 - We can delegate to the HPC cluster's GPU nodes
@@ -362,8 +363,8 @@ train-script.sh
 
 #### Pose estimation
 - [Quantifying behavior to understand the brain](https://doi.org/10.1038/s41593-020-00734-z)
-- [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
-- [SLEAP](https://sleap.ai/)
+- [SLEAP](https://sleap.ai/
+- [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut))
 
 #### SWC wiki
 - [Overview of SLURM job scheduler](https://wiki.ucl.ac.uk/display/SSC/Overview+of+SLURM+job+scheduler)

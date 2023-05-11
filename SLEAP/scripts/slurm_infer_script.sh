@@ -1,26 +1,24 @@
-#!/bin/bash
+#!/bin/bash 
 
-#SBATCH -p gpu # partition (queue)
+#SBATCH -p gpu # partition
 #SBATCH -N 1   # number of nodes
 #SBATCH --mem 12G # memory pool for all cores
 #SBATCH -n 2 # number of cores
-#SBATCH -t 0-02:00 # time (D-HH:MM)
+#SBATCH -t 0-01:00 # time (D-HH:MM)
 #SBATCH --gres gpu:1 # request 1 GPU (of any kind)
-#SBATCH -o slurm.%N.%j.out # STDOUT
-#SBATCH -e slurm.%N.%j.err # STDERR
+#SBATCH -o slurm.%N.%j.out # write STDOUT
+#SBATCH -e slurm.%N.%j.err # write STDERR
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk  
 
 # Load the SLEAP module
 module load SLEAP
 
-# Define data directory
+# Define directories for data and exported training job
 DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
-# Define exported job directory
 JOB_DIR=$DATA_DIR/labels.v001.slp.training_job
-
 # Go to the job directory
-cd $JOB_DIR
+cd $JOB_DIR 
 
 # Run the inference command
 sleap-track $DATA_DIR/videos/M708149_EPM_20200317_165049331-converted.mp4 \
