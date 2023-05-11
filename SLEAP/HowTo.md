@@ -50,14 +50,14 @@ Load the SLEAP module. This might take some seconds, but it should finish withou
 <SWC-USERNAME>@gpu-350-04:~$ module load SLEAP
 (sleap) <SWC-USERNAME>@gpu-350-04:~$
 ```
-The hostname (the part between "@" and ":") will vary depending on which GPUnode   you were assigned to.
+The hostname (the part between "@" and ":") will vary depending on which GPU node   you were assigned to.
 To verify that the module was loaded successfully:
 ```bash
 $ module list
 Currently Loaded Modulefiles:
  1) SLEAP/2023-03-13
 ```
-The module is essentially a centrally installed conda environment. When it   isloaded, you should be using particular executables for conda and Python. You   canverify this by running:
+The module is essentially a centrally installed conda environment. When it is loaded, you should be using particular executables for conda and Python. You can verify this by running:
 ```bash
  $ which conda
  /ceph/apps/ubuntu-20/packages/SLEAP/2023-03-13/condabin/conda
@@ -69,7 +69,7 @@ Finally we will verify that the `sleap` python package can be imported and can "
 ```bash
 $ python
 ```
-Next, run the following Python commands (shown below with their expected outputs  :
+Next, run the following Python commands (shown below with their expected outputs:
 ```python
 >>> import sleap
 
@@ -94,7 +94,7 @@ GPUs: 1/1 available
 ```
 > **Warning**
 > 
-> The `import sleap` command may take some time to run (more than a minute).  This is normal, and it should only happen the first time you import the module.  Subsequent imports should be much faster.
+> The `import sleap` command may take some time to run (more than a minute).  This is normal. Subsequent imports should be faster.
 
 If all is as expected, you can exit the Python interpreter, and then exit the GPU node
 ```python
@@ -126,7 +126,7 @@ This will consist of two parts - [preparing a training job](#prepare-the-trainin
    - For selecting the right configuration parameters, see [Configuring Models](https://sleap.ai/guides/choosing-models.html#) and [Troubleshooting Workflows](https://sleap.ai/guides/troubleshooting-workflows.html)
    - Set the "Predict On" parameter to "nothing". Remote training and inference (prediction) are easiest to run separately on the HPC Cluster.
    - If you are working with a top-down camera view, set the "Rotation Min Angle" and "Rotation Max Angle" to -180 and 180 respectively in the "Augmentation" section.
-   - Ensure to save the exported training job package (e.g. `labels.v001.slp.training_job.zip`) in the mounted SWC filesystem, ideally in the same directory as the project file.
+   - Make sure to save the exported training job package (e.g. `labels.v001.slp.training_job.zip`) in the mounted SWC filesystem, ideally in the same directory as the project file.
    - Unzip the training job package. This will create a folder with the same name (minus the `.zip` extension). This folder contains everything needed to run the training job on the HPC cluster.
 
 ### Run the training job
@@ -139,7 +139,7 @@ Navigate to the training job folder (replace with your own path) and list its co
 ```bash
 $ cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
 $ cd labels.v001.slp.training_job
-$ls -1
+$ ls -1
 ```
 There should be a `train-script.sh` file created by SLEAP, which already contains the commands to run the training. You can see the contents of the file by running:
 ```bash
@@ -148,7 +148,7 @@ $ cat train-script.sh
 sleap-train centroid.json labels.v001.pkg.slp
 sleap-train centered_instance.json labels.v001.pkg.slp
 ```
-The precise commands will depend on the model configuration you chose in SLEAP. Here we see two separate training calls, one for the "centroid" and another for the "centered_instance" model. That's because in this example we have chose the ["Top-Down"](https://sleap.ai/tutorials/initial-training.html#training-options) configuration, which consists of two neural networks - the first for isolating the animal instances (by finding their centroids) and the second for predicting all the body parts per instance.
+The precise commands will depend on the model configuration you chose in SLEAP. Here we see two separate training calls, one for the "centroid" and another for the "centered_instance" model. That's because in this example we have chosen the ["Top-Down"](https://sleap.ai/tutorials/initial-training.html#training-options) configuration, which consists of two neural networks - the first for isolating the animal instances (by finding their centroids) and the second for predicting all the body parts per instance.
 
 ![Top-Down model configuration](https://sleap.ai/_images/topdown_approach.jpg)
 
@@ -188,11 +188,11 @@ cd $JOB_DIR
 > 
 > The `#SBATCH` lines are SLURM directives. They specify the resources needed for the job, such as the number of nodes, CPUs, memory, etc. For more information  see the [SLURM documentation](https://slurm.schedmd.com/sbatch.html).
 >
-> - the `-p gpu` and `--gres gpu:1` options ensure that your job will run on GPU. If you want to request a specific GPU type, you can do so with the syntax `--gres   gpu:rtx2080:1`. You can view the available GPU types on the [SWC internal wiki](https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture).
+> - the `-p gpu` and `--gres gpu:1` options ensure that your job will run on a GPU. If you want to request a specific GPU type, you can do so with the syntax `--gres gpu:rtx2080:1`. You can view the available GPU types on the [SWC internal wiki](https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture).
 > - the `--mem` option refers to CPU memory (RAM), not the GPU one. However, the   jobs often contain steps that use the RAM.
 > - the `-t` option should be your time estimate for how long the job will take. If it's too short, SLURM will terminate the job before it's over. If it's too long, it may take some time to be scheduled (depending on resource availability). With time, you will build experience on how long various jobs take. It's best to start by running small jobs (e.g. reduce the number of epochs) and scale up gradually.
-> - `-o` and `-e` allow you to specify files to which the standard output an  error   will be passed. In the above configuration, the filenames will contai  the node   name (`%N`) and the job ID (`$j`)
-> - The `--mail-type` and `--mail-user` options allow you to get email notifications about the progress of your job. Currently email notifications are not working on   the SWC HPC cluster, but this might be fixed in the future.
+> - `-o` and `-e` allow you to specify files to which the standard output and error will be directed. In the example scipt above, the filenames are set to contain the node name (`%N`) and the job ID (`$j`).
+> - The `--mail-type` and `--mail-user` options allow you to get email notifications about the progress of your job. Currently email notifications are not working on the SWC HPC cluster, but this might be fixed in the future.
 >   
 > The `module load SLEAP` line loads the SLEAP module, which we checked earlier.
 >   
