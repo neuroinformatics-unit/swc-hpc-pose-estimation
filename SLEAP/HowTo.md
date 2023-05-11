@@ -6,7 +6,7 @@ This guide explains how to test and use the [SLEAP](https://sleap.ai/) module th
   - [Table of contents](#table-of-contents)
   - [Abbreviations](#abbreviations)
   - [Prerequisites](#prerequisites)
-    - [Verify access to the HPC Cluster and the SLEAP module](#verify-access-to-the-hpc-cluster-and-the-sleap-module)
+    - [Verify access to the HPC cluster and the SLEAP module](#verify-access-to-the-hpc-cluster-and-the-sleap-module)
     - [Install SLEAP on your local PC/laptop](#install-sleap-on-your-local-pclaptop)
     - [Mount the SWC filesystem on your local PC/laptop](#mount-the-swc-filesystem-on-your-local-pclaptop)
   - [Model training](#model-training)
@@ -46,7 +46,7 @@ This guide explains how to test and use the [SLEAP](https://sleap.ai/) module th
 
 ## Prerequisites
 
-### Verify access to the HPC Cluster and the SLEAP module
+### Verify access to the HPC cluster and the SLEAP module
 Log into the HPC login node (typing your `<SWC-PASSWORD>` both times when prompted):
 ```bash
 $ ssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk
@@ -67,6 +67,7 @@ Load the SLEAP module. This might take some seconds, but it should finish withou
 (sleap) <SWC-USERNAME>@gpu-350-04:~$
 ```
 The hostname (the part between "@" and ":") will vary depending on which GPU node   you were assigned to.
+
 To verify that the module was loaded successfully:
 ```bash
 $ module list
@@ -75,11 +76,11 @@ Currently Loaded Modulefiles:
 ```
 The module is essentially a centrally installed conda environment. When it is loaded, you should be using particular executables for conda and Python. You can verify this by running:
 ```bash
- $ which conda
- /ceph/apps/ubuntu-20/packages/SLEAP/2023-03-13/condabin/conda
+$ which conda
+/ceph/apps/ubuntu-20/packages/SLEAP/2023-03-13/condabin/conda
 
- $ which python
- /nfs/nhome/live/<SWC-USERNAME>/.conda/envs/sleap/bin/python
+$ which python
+/nfs/nhome/live/<SWC-USERNAME>/.conda/envs/sleap/bin/python
 ```
 Finally we will verify that the `sleap` python package can be imported and can "see" the GPU. We will just follow the [relevant SLEAP instructions](https://sleap.ai/installation.html#testing-that-things-are-working). First, start a Python interpreter:
 ```bash
@@ -114,8 +115,8 @@ GPUs: 1/1 available
 
 If all is as expected, you can exit the Python interpreter, and then exit the GPU node
 ```python
- >>> exit()
- $ exit
+>>> exit()
+$ exit
 ```
 To completely exit the HPC cluster, you will need to logout of the SSH session  twice:
 ```bash
