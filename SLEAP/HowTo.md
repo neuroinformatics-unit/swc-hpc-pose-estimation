@@ -2,6 +2,8 @@
 This guide explains how to test and use the [SLEAP](https://sleap.ai/) module that is installed on the SWC's HPC cluster for running training and/or inference jobs.
 
 ## Abbreviations
+| Acronym | Meaning |
+| --- | --- |
 | SLEAP | Social LEAP Estimates Animal Poses |
 | SWC | Sainsbury Wellcome Centre |
 | HPC | High Performance Computing |
