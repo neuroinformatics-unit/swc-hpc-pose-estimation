@@ -1,6 +1,22 @@
 # How to use the SLEAP module
 This guide explains how to test and use the [SLEAP](https://sleap.ai/) module that is installed on the SWC's HPC cluster for running training and/or inference jobs.
 
+## Table of contents
+- [How to use the SLEAP module](#how-to-use-the-sleap-module)
+  - [Table of contents](#table-of-contents)
+  - [Abbreviations](#abbreviations)
+  - [Prerequisites](#prerequisites)
+    - [Verify access to the HPC Cluster and the SLEAP module](#verify-access-to-the-hpc-cluster-and-the-sleap-module)
+    - [Install SLEAP on your local PC/laptop](#install-sleap-on-your-local-pclaptop)
+    - [Mount the SWC filesystem on your local PC/laptop](#mount-the-swc-filesystem-on-your-local-pclaptop)
+  - [Model training](#model-training)
+    - [Prepare the training job](#prepare-the-training-job)
+    - [Run the training job](#run-the-training-job)
+    - [Evaluate the trained models](#evaluate-the-trained-models)
+  - [Model inference](#model-inference)
+  - [The training-inference cycle](#the-training-inference-cycle)
+
+
 ## Abbreviations
 | Acronym | Meaning |
 | --- | --- |
