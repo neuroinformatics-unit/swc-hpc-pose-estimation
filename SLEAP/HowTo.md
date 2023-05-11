@@ -174,19 +174,50 @@ This will consist of two parts - [preparing a training job](#prepare-the-trainin
   ./train-script.sh
   ```
   
-    The `#SBATCH` lines are SLURM directives. They specify the resources needed for the   job, such as the number of nodes, CPUs, memory, etc. For more information, see the   [SLURM documentation](https://slurm.schedmd.com/sbatch.html).
+  The `#SBATCH` lines are SLURM directives. They specify the resources needed fo  the   job, such as the number of nodes, CPUs, memory, etc. For more information  see the [SLURM documentation](https://slurm.schedmd.com/sbatch.html).
+
+  - the `-p gpu` and `--gres gpu:1` options ensure that your job will run on   GPU.   If you want to request a specific GPU type, you can do so with the syntax `--gres   gpu:rtx2080:1`. You can view the available GPU types on the [SWC internal wiki](https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture).
+  - the `--mem` option refers to CPU memory (RAM), not the GPU one. However, the   jobs often contain steps that use the RAM.
+  - the `-t` option should be your time estimate for how long the job will take. If it's too short, SLURM will terminate the job before it's over. If it's too long, it may take some time to be scheduled (depending on resource availability). With time, you will build experience on how long various jobs take. It's best to start by running small jobs (e.g. reduce the number of epochs) and scale up gradually.
+  - `-o` and `-e` allow you to specify files to which the standard output an  error   will be passed. In the above configuration, the filenames will contai  the node   name (`%N`) and the job ID (`$j`)
+  - The `--mail-type` and `--mail-user` options allow you to get email notifications about the progress of your job. Currently email notifications are not working on   the SWC HPC cluster, but this might be fixed in the future.
+   
+  The `module load SLEAP` line loads the SLEAP module, which we checked earlier.
+   
+  The `cd` line changes the working directory to the training job folder. This is   necessary because the `train-script.sh` file contains relative paths to th  model   configuration and the project file.
   
-    - the `-p gpu` and `--gres gpu:1` options ensure that your job will run on a GPU.   If you want to request a specific GPU type, you can do so with the syntax `--gres   gpu:rtx2080:1`. You can view the available GPU types on the [SWC internal wiki]  (https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture)
-    - the `--mem` options refers to CPU memory (RAM), not the GPU one. However, the   jobs often contain steps that use the RAM.
-    - the `-t` should be your time estimate for how long the job will take. If it's too   short, SLURM will terminate the job before it's over. If it's too long, it may take   some time to be scheduled (depending on resource availability). With time, you will   build experience on how long various jobs take. It's best to start by running small   jobs (e.g. reduce the number of epochs) and scale up gradually.
-    - `-o` and `-e` allow you to specify files to which the standard output and error   will be passed. In the above configuration, the filenames will contain the node   name (`%N`) and the job ID (`$j`)
-    - The `--mail-type` and `--mail-user` options allow you to get email notifications   about the progress of your job. Currently email notifications are not working on   the SWC HPC cluster, but this might be fixed in the future.
-     
-    The `module load SLEAP` line loads the SLEAP module, which we checked earlier.
-     
-    The `cd` line changes the working directory to the training job folder. This is   necessary because the `train-script.sh` file contains relative paths to the model   configuration and the project file.
-    
-    The `./train-script.sh` line runs the training job (executes the contained commands)
+  The `./train-script.sh` line runs the training job (executes the containe  commands)
+
+- Submit the batch script with:
+  ```bash
+  $ sbatch slurm_train_script.sh
+  Submitted batch job 3445652
+  ```
+- Monitor the batch script.
+  ```bash
+  # View status of queued/running jobs
+  $ squeue -u <SWC-USERNAME>
+  JOBID    PARTITION  NAME     USER      ST  TIME   NODES  NODELIST(REASON)
+  3445652  gpu        slurm_ba sirmpila  R   23:11  1      gpu-sr670-20
+  
+  # View status of running/completed jobs
+  $ sacct -u <SWC-USERNAME>
+  JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
+  ------------ ---------- ---------- ---------- ---------- ---------- -------- 
+  3445652      slurm_bat+        gpu     swc-ac          2  COMPLETED      0:0 
+  3445652.bat+      batch                swc-ac          2  COMPLETED      0:0
+ 
+  # sacct with some helpful arguments
+  sacct -u <SWC-USERNAME> \
+    --starttime $(date -d '24 hours ago' +%Y-%m-%dT%H:%M:%S) \
+    --endtime $(date +%Y-%m-%dT%H:%M:%S) \
+    --format=JobID,JobName,Partition,AllocCPUS,State,Start,End,Elapsed,MaxRSS
+
+  # View the contents of standard output and error
+  # (the node name and job ID will differ in each case)
+  $ cat slurm.gpu-sr670-20.3445652.out
+  $ cat slurm.gpu-sr670-20.3445652.err
+  ```
 
 
 
