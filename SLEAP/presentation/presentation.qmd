@@ -1,12 +1,11 @@
 ---
 title: Pose estimation with SLEAP
-subtitle: HPC cluster use case
-author: Niko Sirmpilatze
+subtitle: Introduction to HPC with Linux | 2023-05-15
+author: Niko Sirmpilatze | Neuroinformatics Unit
 format:
     revealjs:
         theme: [default, niu-light.scss]
         logo: img/logo_niu_light.png
-        footer: "Introduction to HPC with Linux | 2023-05-15"
         slide-number: c
         menu:
             numbers: true
@@ -454,10 +453,12 @@ What if we want to run the previous script for multiple batch sizes?
 ::: {.fragment}
 **Solution:** submit an array job
 
+![](diagrams/array-jobs.svg){fig-align=left width=500}
+:::
+
+::: {.fragment}
 - the jobs will run in parallel if there are enough resources
 - otherwise, they will be scheduled to run sequentially
-
-![](diagrams/array-jobs.svg){fig-align=left width=500}
 :::
 
 ## Example array job {.smaller}
@@ -507,5 +508,5 @@ python run_sleap_training.py --batch-size "${ARGS[$SLURM_ARRAY_TASK_ID]}"
 
 * Alex Martin (setting up HPC modules)
 * Loukia Katsouri (mouse videos)
-* Laura Scwarz and Tom Hagley (SLEAP workflow)
+* Laura Schwarz and Tom Hagley (SLEAP workflow)
 * Chang Huan Lo (SLEAP Python code)
