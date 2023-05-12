@@ -14,7 +14,7 @@ def main(batch_size=4):
     directory as this script. SLEAPTrainer_TopDown_SingleInstance
     is a convenience class for training top-down SLEAP models on
     single instance data.
-    
+
     Parameters
     ----------
     batch_size : int

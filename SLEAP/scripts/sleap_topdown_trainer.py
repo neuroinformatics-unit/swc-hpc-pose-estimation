@@ -72,7 +72,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         self.cfg.data.instance_cropping.crop_size = 350
 
     def _split_labels(self):
-        """Load labels from an exported SLEAP training-job labels package, 
+        """Load labels from an exported SLEAP training-job labels package,
         split into train/val/test sets,
         and save as separate SLEAP package files. The split files will be saved
         in the training job directory `train_dir`, with the split name appended
