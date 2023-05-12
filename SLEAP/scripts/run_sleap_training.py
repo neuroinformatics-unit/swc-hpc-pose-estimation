@@ -30,7 +30,7 @@ def main(batch_size=4):
             / "labels.v002.slp.training_job/labels.v002.pkg.slp",
             skeleton_path=TEST_DATA_DIR / "skeleton.json",
             train_fraction=0.8,
-            run_name_prefix=f"batch-size-{batch_size}",
+            run_name_prefix=f"batch-size-{batch_size}.",
             anchor_part="centre",
             camera_view="top",
         )
