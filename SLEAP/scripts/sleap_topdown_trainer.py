@@ -70,7 +70,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         self.cfg.data.preprocessing.ensure_grayscale = True
         self.cfg.data.instance_cropping.center_on_part = anchor_part
         self.cfg.data.instance_cropping.crop_size_detection_padding = 32
-        self.cfg.data.instance_cropping.crop_size = 350
+        self.cfg.data.instance_cropping.crop_size = 350         
 
     def _split_labels(self):
         """Load labels from an exported SLEAP training-job labels package,
@@ -129,17 +129,21 @@ class SLEAPTrainer_TopDown_SingleInstance:
             self.cfg.optimization.augmentation_config.rotation_min_angle = -30
             self.cfg.optimization.augmentation_config.rotation_max_angle = 30
 
-    def configure_centroid_model(
+    def configure_model(
         self,
+        model_type: str = "centroid",
         input_scaling: float = 0.5,
         n_epochs: int = 50,
         batch_size: int = 4,
         max_stride: int = 32,
     ):
-        """Configure training job for a centroid model.
+        """Configure training job for model training.
 
         Parameters
         ----------
+        model_type : str
+            Type of model to train. Must be one of "centroid" or "centered_instance".
+            Default is "centroid".
         input_scaling : float
             Scaling factor for input images. Default is 0.5.
         n_epochs : int
@@ -149,71 +153,55 @@ class SLEAPTrainer_TopDown_SingleInstance:
         max_stride : int
             Maximum stride for UNet backbone. Default is 32.
         """
-        self.centroid_cfg = self.cfg
-        self.centroid_cfg.model.model_type = "centroid"
-        self.centroid_cfg.data.preprocessing.input_scaling = input_scaling
-        self.centroid_cfg.optimization.epochs = n_epochs
-        self.centroid_cfg.optimization.batch_size = batch_size
 
-        self.centroid_cfg.model.backbone.unet = UNetConfig(
-            max_stride=max_stride,
-            filters=16,
-            filters_rate=2.00,
-            output_stride=2,
-            up_interpolate=True,
-        )
-        self.centroid_cfg.model.heads.centroid = CentroidsHeadConfig(
-            anchor_part=self.anchor_part, sigma=2.5, output_stride=2
-        )
-
-    def configure_centered_instance_model(
-        self,
-        input_scaling: float = 1.0,
-        n_epochs: int = 100,
-        batch_size: int = 4,
-        max_stride: int = 32,
-    ):
-        """Configure training job for a centered instance model.
-
-        Parameters
-        ----------
-        input_scaling : float
-            Scaling factor for input images. Default is 1.0.
-        n_epochs : int
-            Number of training epochs. Default is 100.
-        batch_size : int
-            Batch size for training. Default is 4.
-        max_stride : int
-            Maximum stride for UNet backbone. Default is 32.
-        """
-        self.instance_cfg = self.cfg
-        self.instance_cfg.model.model_type = "centered_instance"
-        self.instance_cfg.data.preprocessing.input_scaling = input_scaling
-        self.instance_cfg.optimization.epochs = n_epochs
-        self.instance_cfg.optimization.batch_size = batch_size
-
-        skeleton = sleap.Skeleton.load_json(self.skeleton_path.as_posix())
-        self.instance_cfg.data.labels.skeletons = [skeleton]
-
-        self.instance_cfg.model.backbone.unet = UNetConfig(
-            max_stride=max_stride,
-            filters=24,
-            filters_rate=2.00,
-            output_stride=4,
-            up_interpolate=True,
-        )
-        self.instance_cfg.model.heads.centered_instance = (
-            CenteredInstanceConfmapsHeadConfig(
-                anchor_part=self.anchor_part,
-                sigma=2.5,
-                output_stride=4,
-                loss_weight=1.0,
+        self.model_type = model_type
+        self.cfg.data.preprocessing.input_scaling = input_scaling
+        self.cfg.optimization.epochs = n_epochs
+        self.cfg.optimization.batch_size = batch_size
+        
+        if self.model_type == "centroid":
+            self.cfg.outputs.run_name_suffix = ".centroid"
+            self.cfg.model.backbone.unet = UNetConfig(
+                max_stride=max_stride,
+                filters=16,
+                filters_rate=2.00,
+                output_stride=2,
+                up_interpolate=True,
             )
-        )
+            self.cfg.model.heads.centroid = CentroidsHeadConfig(
+                anchor_part=self.anchor_part, sigma=2.5, output_stride=2
+            )
+            self.cfg.model.heads.centered_instance = None
 
-    def train_models(self):
+        elif self.model_type == "centered_instance":
+            self.cfg.outputs.run_name_suffix = ".centered_instance"
+            skeleton = sleap.Skeleton.load_json(self.skeleton_path.as_posix())
+            self.cfg.data.labels.skeletons = [skeleton]
+
+            self.cfg.model.backbone.unet = UNetConfig(
+                max_stride=max_stride,
+                filters=24,
+                filters_rate=2.00,
+                output_stride=4,
+                up_interpolate=True,
+            )
+            self.cfg.model.heads.centered_instance = (
+                CenteredInstanceConfmapsHeadConfig(
+                    anchor_part=self.anchor_part,
+                    sigma=2.5,
+                    output_stride=4,
+                    loss_weight=1.0,
+                )
+            )
+            self.cfg.model.heads.centroid = None
+        
+        else:
+            raise ValueError(
+                "model_type must be one of 'centroid' or 'centered_instance'."
+            )
+
+    def train_model(self):
         """Train SLEAP model using the given training configurations."""
-        for cfg in [self.centroid_cfg, self.instance_cfg]:
-            trainer = Trainer.from_config(cfg)
-            trainer.setup()
-            trainer.train()
+        trainer = Trainer.from_config(self.cfg)
+        trainer.setup()
+        trainer.train()
