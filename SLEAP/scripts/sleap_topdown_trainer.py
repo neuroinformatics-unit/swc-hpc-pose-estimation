@@ -23,6 +23,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         camera_view: str = "top",
     ):
         """Class for training top-down SLEAP models on single instance data.
+        It is inspired by a Jupyter Notebook written by Chang Huan Lo.
 
         Parameters
         ----------

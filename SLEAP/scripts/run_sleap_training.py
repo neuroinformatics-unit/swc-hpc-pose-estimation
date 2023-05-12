@@ -6,12 +6,28 @@ TEST_DATA_DIR = Path("/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
 
 
 def main(batch_size=4):
+    """Train SLEAP model with variable batch size.
+
+    This functions runs a SLEAP training job using the
+    SLEAPTrainer_TopDown_SingleInstance class from
+    `sleap_topdown_trainer.py`, which should be located in the same
+    directory as this script. SLEAPTrainer_TopDown_SingleInstance
+    is a convenience class for training top-down SLEAP models on
+    single instance data.
+    
+    Parameters
+    ----------
+    batch_size : int
+        Batch size for training. Default is 4.
+        Applies to both centroid and centered instance models
+        of the top-down configuration.
+    """
     training_job = SLEAPTrainer_TopDown_SingleInstance(
         train_dir=TEST_DATA_DIR / "labels.v002.slp.array_training",
         labels_path=TEST_DATA_DIR / "labels.v002.slp",
         skeleton_path=TEST_DATA_DIR / "skeleton.json",
         train_fraction=0.8,
-        run_name_prefix=None,
+        run_name_prefix=f"batch-size-{batch_size}",
         anchor_part="centre",
         camera_view="top",
     )
@@ -27,6 +43,7 @@ def main(batch_size=4):
         batch_size=batch_size,
         max_stride=32,
     )
+    training_job.train_models()
 
 
 if __name__ == "__main__":
@@ -39,6 +56,7 @@ if __name__ == "__main__":
         "-b",
         type=int,
         default=4,
+        dest="batch_size",
         help="Batch size for training (default: 4)",
     )
     args = parser.parse_args()
