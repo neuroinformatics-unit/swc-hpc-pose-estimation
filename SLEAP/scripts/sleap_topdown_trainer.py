@@ -80,7 +80,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         Creates the following attribute:
         - `labels_split_paths`: dictionary with keys "train", "val", and "test"
         """
-        labels = sleap.load_file(self.labels_path.as_posix)
+        labels = sleap.load_file(self.labels_path.as_posix())
         labels_train, labels_val_test = labels.split(n=self.train_fraction)
         labels_val, labels_test = labels_val_test.split(n=0.5)
         labels_split_data = {
