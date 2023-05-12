@@ -3,6 +3,6 @@ This repository contains guides on how to use pose estimation software on the HP
 
 So far, we have covered:
 - [SLEAP](https://sleap.ai/)
-  - [Presentation (html)](./SLEAP/presentation/presentation.html)
+  - [Presentation (html)](https://neuroinformatics-unit.github.io/swc-hpc-pose-estimation)
   - [How-To guide](./SLEAP/HowTo.md)
   - [Example scripts](./SLEAP/scripts)
