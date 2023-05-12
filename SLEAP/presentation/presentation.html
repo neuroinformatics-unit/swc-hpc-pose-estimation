@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.340">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Niko Sirmpilatze | Neuroinformatics Unit">
+
+<title>Pose estimation with SLEAP</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="presentation_files/libs/clipboard/clipboard.min.js"></script>
+<script src="presentation_files/libs/quarto-html/quarto.js"></script>
+<script src="presentation_files/libs/quarto-html/popper.min.js"></script>
+<script src="presentation_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="presentation_files/libs/quarto-html/anchor.min.js"></script>
+<link href="presentation_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="presentation_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="presentation_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="presentation_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="presentation_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="presentation.html"><i class="bi bi-file-slides"></i>RevealJS</a></li></ul></div></div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Pose estimation with SLEAP</h1>
+<p class="subtitle lead">Introduction to HPC with Linux | 2023-05-15</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Niko Sirmpilatze | Neuroinformatics Unit </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="course-materials" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="course-materials">Course materials</h2>
+<section id="sample-data" class="level4">
+<h4 class="anchored" data-anchor-id="sample-data">Sample data</h4>
+<p><code>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</code></p>
+<ul>
+<li>Mouse videos (from <a href="https://www.sainsburywellcome.org/web/people/loukia-katsouri">Loukia Katsouri</a>)</li>
+<li>SLEAP project with:
+<ul>
+<li>labelled frames</li>
+<li>trained models</li>
+<li>prediction results</li>
+</ul></li>
+</ul>
+</section>
+<section id="github-repository" class="level4">
+<h4 class="anchored" data-anchor-id="github-repository">Github repository</h4>
+<p><a href="https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation">github.com/neuroinformatics-unit/swc-hpc-pose-estimation</a></p>
+<ul>
+<li>This presentation</li>
+<li>Example scripts</li>
+<li>Detailed “How To” guide</li>
+</ul>
+</section>
+</section>
+<section id="tracking-animals-in-videos" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="tracking-animals-in-videos">Tracking animals in videos</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/tracking_types.png" height="500" class="figure-img"></p>
+<figcaption class="figure-caption">source: <a href="https://doi.org/10.1038/s41593-020-00734-z">doi.org/10.1038/s41593-020-00734-z</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="pose-estimation" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="pose-estimation">Pose estimation</h2>
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="img/pose_estimation_2D.png" class="r-stretch img-fluid figure-img"></p>
+<figcaption class="figure-caption">source: <a href="https://doi.org/10.1038/s41593-020-00734-z">doi.org/10.1038/s41593-020-00734-z</a></figcaption>
+</figure>
+</div>
+</section>
+<section id="existing-tools" class="level2">
+<h2 class="anchored" data-anchor-id="existing-tools">Existing tools</h2>
+<div class="columns">
+<div class="column" style="width:35%;">
+<ul>
+<li><a href="http://www.mackenziemathislab.org/deeplabcut">DeepLabCut</a></li>
+<li><a href="https://sleap.ai/">SLEAP</a></li>
+<li>Many others:
+<ul>
+<li>OpenPose</li>
+<li>DeepPoseKit</li>
+<li>Anipose</li>
+<li>Freipose</li>
+<li>…</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:65%;">
+<p><img src="img/sleap_movie.gif" class="img-fluid"></p>
+</div>
+</div>
+</section>
+<section id="sleap-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="sleap-workflow">SLEAP workflow</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="diagrams/pose-estimation.svg" class="img-fluid figure-img" width="600"></p>
+</figure>
+</div>
+<div class="fragment">
+<ul>
+<li>Training and inference are GPU-intensive</li>
+<li>We can delegate to the HPC cluster’s GPU nodes</li>
+</ul>
+</div>
+</section>
+<section id="label-body-parts" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="label-body-parts">Label body parts</h2>
+<ul>
+<li>Annotate frames using the <code>sleap-label</code> GUI on your PC/laptop</li>
+<li>Save project (e.g.&nbsp;<code>labels.v001.slp</code>)</li>
+</ul>
+<p><img src="img/sleap-label_screenshot.png" class="img-fluid"></p>
+</section>
+<section id="configure-training" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="configure-training">Configure training</h2>
+<ul>
+<li>In the <code>sleap-label</code> GUI: <code>Predict/Run Training...</code></li>
+</ul>
+<p><img src="img/sleap-train_config.png" class="img-fluid"></p>
+<ul>
+<li>When ready, <code>Export training job package...</code></li>
+</ul>
+</section>
+<section id="training-job-package-contents" class="level2">
+<h2 class="anchored" data-anchor-id="training-job-package-contents">Training job package contents</h2>
+<p><code>labels.v001.slp.training_job.zip</code> =&gt; unzip</p>
+<div class="sourceCode" id="cb1" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Copy of labelled frames</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">labels.v001.pkg.slp</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Model configuration files</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">centroid.json</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">centered_instance.json</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Bash scripts for running training and inference</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">train_script.sh</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">inference_script.sh</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Summary of all jobs</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">jobs.yaml</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="top-down-vs-bottom-up" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="top-down-vs-bottom-up">Top-down vs bottom-up</h2>
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="img/pose_estimation_topdown.png" height="220" class="figure-img"></p>
+</figure>
+</div>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="img/pose_estimation_bottomup.png" height="220" class="figure-img"></p>
+<figcaption class="figure-caption">source: <a href="https://doi.org/10.1038/s41593-020-00734-z">doi.org/10.1038/s41593-020-00734-z</a></figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="finding-our-project-on-the-hpc" class="level2">
+<h2 class="anchored" data-anchor-id="finding-our-project-on-the-hpc">Finding our project on the HPC</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Logging into the HPC cluster</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ssh</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span>@ssh.swc.ucl.ac.uk <span class="co"># Provide password</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="fu">ssh</span> hpc-gw1 <span class="co"># Provide password again</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="co"># Navigate to your SLEAP project</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a><span class="bu">cd</span> /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb2-7"><a href="#cb2-7"></a><span class="co"># Check the contents of your folder</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a><span class="fu">ls</span> <span class="at">-l</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a></span>
+<span id="cb2-10"><a href="#cb2-10"></a><span class="co"># Go inside the exported training package</span></span>
+<span id="cb2-11"><a href="#cb2-11"></a><span class="bu">cd</span> labels.v001.slp.training_job</span>
+<span id="cb2-12"><a href="#cb2-12"></a><span class="fu">ls</span> <span class="at">-l</span></span>
+<span id="cb2-13"><a href="#cb2-13"></a></span>
+<span id="cb2-14"><a href="#cb2-14"></a><span class="co"># View the contents of train-script.sh</span></span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="fu">cat</span> train-script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>train-script.sh</strong></pre>
+</div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sleap-train</span> centroid.json labels.v001.pkg.slp</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="ex">sleap-train</span> centered_instance.json labels.v001.pkg.slp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section>
+<section id="get-slurm-to-run-the-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="get-slurm-to-run-the-script">Get SLURM to run the script</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">Interactive</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Batch</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Array batch</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Suitable for debugging (immediate feedback)</p>
+<ul>
+<li><p>Start an interactive job with one GPU</p>
+<div class="sourceCode" id="cb4" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">srun</span> <span class="at">-p</span> gpu <span class="at">--gres</span><span class="op">=</span>gpu:1 <span class="at">--pty</span> bash <span class="at">-i</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Execute commands one-by-one, e.g.:</p>
+<div class="sourceCode" id="cb5" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> <span class="op">&lt;</span>MY-TRAINING-DIRECTORY<span class="op">&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> train-script.sh</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Stop the session</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="bu">exit</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<p>Main method for submitting jobs</p>
+<ul>
+<li><p>Prepare a batch script, e.g.&nbsp;<code>train_script.sbatch</code></p></li>
+<li><p>Submit the job:</p>
+<div class="sourceCode" id="cb6" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> train_script.sbatch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p>Monitor job status:</p>
+<div class="sourceCode" id="cb7" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ul>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<p>Useful for submitting many similar jobs</p>
+<ul>
+<li>Write a batch script</li>
+<li>Execute the script over an array of inputs in parallel</li>
+</ul>
+</div>
+</div>
+</div>
+</section>
+<section id="get-the-example-scripts" class="level2">
+<h2 class="anchored" data-anchor-id="get-the-example-scripts">Get the example scripts</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Clone the GitHub repository</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="ex">$</span> git clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git</span>
+<span id="cb8-3"><a href="#cb8-3"></a></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="co"># List the available scripts for SLEAP</span></span>
+<span id="cb8-5"><a href="#cb8-5"></a><span class="ex">$</span> cd swc-hpc-pose-estimation/SLEAP/scripts</span>
+<span id="cb8-6"><a href="#cb8-6"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="ex">infer_script.sbatch</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="ex">run_sleap_training.py</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="ex">sleap_topdown_trainer.py</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="ex">train_script.sbatch</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="ex">train_script_python.sbatch</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="ex">train_script_python_array.sbatch</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co"># View the contents of the SLURM train script</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="fu">cat</span> train_script.sbatch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="batch-script-for-training" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="batch-script-for-training">Batch script for training</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>train_script.sbatch</strong></pre>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co">#SBATCH -t 0-04:00 # time (D-HH:MM)</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a><span class="co">#SBATCH --gres gpu:1 # request 1 GPU (of any kind)</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a><span class="co">#SBATCH -o slurm.%N.%j.out # STDOUT</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a><span class="co">#SBATCH -e slurm.%N.%j.err # STDERR</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a><span class="co">#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk</span></span>
+<span id="cb9-13"><a href="#cb9-13"></a></span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="co"># Load the SLEAP module</span></span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb9-16"><a href="#cb9-16"></a></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="co"># Define directories for data and exported training job</span></span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="va">DATA_DIR</span><span class="op">=</span>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb9-19"><a href="#cb9-19"></a><span class="va">JOB_DIR</span><span class="op">=</span><span class="va">$DATA_DIR</span>/labels.v001.slp.training_job</span>
+<span id="cb9-20"><a href="#cb9-20"></a><span class="co"># Go to the job directory</span></span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="bu">cd</span> <span class="va">$JOB_DIR</span></span>
+<span id="cb9-22"><a href="#cb9-22"></a></span>
+<span id="cb9-23"><a href="#cb9-23"></a><span class="co"># Run the training script generated by SLEAP</span></span>
+<span id="cb9-24"><a href="#cb9-24"></a><span class="ex">./train-script.sh</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="submit-and-monitor-batch-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="submit-and-monitor-batch-script">Submit and monitor batch script</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Submit job</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="ex">$</span> sbatch train_script.sbatch</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="ex">Submitted</span> batch job 3445652</span>
+<span id="cb10-4"><a href="#cb10-4"></a></span>
+<span id="cb10-5"><a href="#cb10-5"></a><span class="co"># View status of queued/running jobs</span></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="ex">$</span> squeue <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a><span class="ex">JOBID</span>    PARTITION  NAME     USER      ST  TIME   NODES  NODELIST<span class="er">(</span><span class="ex">REASON</span><span class="kw">)</span></span>
+<span id="cb10-8"><a href="#cb10-8"></a><span class="ex">3445652</span>  gpu        slurm_ba sirmpila  R   23:11  1      gpu-sr670-20</span>
+<span id="cb10-9"><a href="#cb10-9"></a></span>
+<span id="cb10-10"><a href="#cb10-10"></a><span class="co"># View status of running/completed jobs</span></span>
+<span id="cb10-11"><a href="#cb10-11"></a><span class="ex">$</span> sacct <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="ex">JobID</span>           JobName  Partition    Account  AllocCPUS      State ExitCode </span>
+<span id="cb10-13"><a href="#cb10-13"></a><span class="ex">------------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">----------</span> <span class="at">--------</span> </span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="ex">3445652</span>      slurm_bat+        gpu     swc-ac          2  COMPLETED      0:0 </span>
+<span id="cb10-15"><a href="#cb10-15"></a><span class="ex">3445652.bat+</span>      batch                swc-ac          2  COMPLETED      0:0</span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co"># View the contents of standard output and error</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a><span class="ex">$</span> cat slurm.gpu-sr670-20.3445652.out</span>
+<span id="cb10-19"><a href="#cb10-19"></a><span class="ex">$</span> cat slurm.gpu-sr670-20.3445652.err</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="check-trained-models" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="check-trained-models">Check trained models</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1"></a><span class="ex">$</span> cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="ex">$</span> cd labels.v001.slp.training_job</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="ex">$</span> cd models</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
+<span id="cb11-5"><a href="#cb11-5"></a><span class="ex">230509_141357.centered_instance</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a><span class="ex">230509_141357.centroid</span></span>
+<span id="cb11-7"><a href="#cb11-7"></a></span>
+<span id="cb11-8"><a href="#cb11-8"></a><span class="ex">$</span> cd 230509_141357.centered_instance</span>
+<span id="cb11-9"><a href="#cb11-9"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="ex">best_model.h5</span></span>
+<span id="cb11-11"><a href="#cb11-11"></a><span class="ex">initial_config.json</span></span>
+<span id="cb11-12"><a href="#cb11-12"></a><span class="ex">labels_gt.train.slp</span></span>
+<span id="cb11-13"><a href="#cb11-13"></a><span class="ex">labels_gt.val.slp</span></span>
+<span id="cb11-14"><a href="#cb11-14"></a><span class="ex">labels_pr.train.slp</span></span>
+<span id="cb11-15"><a href="#cb11-15"></a><span class="ex">labels_pr.val.slp</span></span>
+<span id="cb11-16"><a href="#cb11-16"></a><span class="ex">metrics.train.npz</span></span>
+<span id="cb11-17"><a href="#cb11-17"></a><span class="ex">metrics.val.npz</span></span>
+<span id="cb11-18"><a href="#cb11-18"></a><span class="ex">training_config.json</span></span>
+<span id="cb11-19"><a href="#cb11-19"></a><span class="ex">training_log.csv</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>View evaluation metrics with the <code>sleap-label</code> GUI on your PC/laptop</li>
+<li><code>Predict/Evaluation Metrics for Trained Models...</code></li>
+</ul>
+</div>
+</section>
+<section id="batch-script-for-inference" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="batch-script-for-inference">Batch script for inference</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>infer_script.sbatch</strong></pre>
+</div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
+<span id="cb12-6"><a href="#cb12-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co">#SBATCH -t 0-01:00 # time (D-HH:MM)</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a><span class="co">#SBATCH --gres gpu:1 # request 1 GPU (of any kind)</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co">#SBATCH -o slurm.%N.%j.out # STDOUT</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co">#SBATCH -e slurm.%N.%j.err # STDERR</span></span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a><span class="co">#SBATCH --mail-user=n.sirmpilatze@@ucl.ac.uk</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co"># Load the SLEAP module</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb12-16"><a href="#cb12-16"></a></span>
+<span id="cb12-17"><a href="#cb12-17"></a><span class="co"># Define data directory</span></span>
+<span id="cb12-18"><a href="#cb12-18"></a><span class="va">DATA_DIR</span><span class="op">=</span>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb12-19"><a href="#cb12-19"></a><span class="co"># Define exported job directory</span></span>
+<span id="cb12-20"><a href="#cb12-20"></a><span class="va">JOB_DIR</span><span class="op">=</span><span class="va">$DATA_DIR</span>/labels.v001.slp.training_job</span>
+<span id="cb12-21"><a href="#cb12-21"></a></span>
+<span id="cb12-22"><a href="#cb12-22"></a><span class="co"># Go to the job directory</span></span>
+<span id="cb12-23"><a href="#cb12-23"></a><span class="bu">cd</span> <span class="va">$JOB_DIR</span></span>
+<span id="cb12-24"><a href="#cb12-24"></a></span>
+<span id="cb12-25"><a href="#cb12-25"></a><span class="co"># Run the inference command</span></span>
+<span id="cb12-26"><a href="#cb12-26"></a><span class="ex">sleap-track</span> <span class="va">$DATA_DIR</span>/videos/M708149_EPM_20200317_165049331-converted.mp4 <span class="dt">\</span></span>
+<span id="cb12-27"><a href="#cb12-27"></a>    <span class="at">-m</span> <span class="va">$JOB_DIR</span>/models/230509_141357.centroid/training_config.json <span class="dt">\</span></span>
+<span id="cb12-28"><a href="#cb12-28"></a>    <span class="at">-m</span> <span class="va">$JOB_DIR</span>/models/230509_141357.centered_instance/training_config.json <span class="dt">\</span></span>
+<span id="cb12-29"><a href="#cb12-29"></a>    <span class="at">--gpu</span> auto <span class="dt">\</span></span>
+<span id="cb12-30"><a href="#cb12-30"></a>    <span class="at">--tracking.tracker</span> none <span class="dt">\</span></span>
+<span id="cb12-31"><a href="#cb12-31"></a>    <span class="at">-o</span> labels.v001.slp.predictions.slp <span class="dt">\</span></span>
+<span id="cb12-32"><a href="#cb12-32"></a>    <span class="at">--verbosity</span> json <span class="dt">\</span></span>
+<span id="cb12-33"><a href="#cb12-33"></a>    <span class="at">--no-empty-frames</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="check-the-predictions" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="check-the-predictions">Check the predictions</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1"></a><span class="ex">$</span> cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb13-2"><a href="#cb13-2"></a><span class="ex">$</span> cd labels.v001.slp.training_job</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="ex">centered_instance.json</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="ex">centroid.json</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a><span class="ex">inference-script.sh</span></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="ex">jobs.yaml</span></span>
+<span id="cb13-8"><a href="#cb13-8"></a><span class="ex">labels.v001.pkg.slp</span></span>
+<span id="cb13-9"><a href="#cb13-9"></a><span class="ex">labels.v001.slp.predictions.slp</span></span>
+<span id="cb13-10"><a href="#cb13-10"></a><span class="ex">models</span></span>
+<span id="cb13-11"><a href="#cb13-11"></a><span class="ex">train-script.sh</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>Inspect the predictions with the <code>sleap-label</code> GUI on your PC/laptop</li>
+</ul>
+</div>
+</section>
+<section id="the-training---inference-cycle" class="level2">
+<h2 class="anchored" data-anchor-id="the-training---inference-cycle">The training - inference cycle</h2>
+<div class="incremental">
+<ul class="incremental">
+<li>Correct some of the predictions: see <a href="https://sleap.ai/tutorials/assisted-labeling.html">Prediction-assisted labeling</a></li>
+<li>Merge corrected labels into the initial training set: see <a href="https://sleap.ai/guides/merging.html">Merging guide</a></li>
+<li>Save the merged training set as<code>labels.v002.slp</code></li>
+<li>Export a new training job <code>labels.v002.slp.training_job</code> (you may reuse the training configurations from <code>v001</code>)</li>
+<li>Repeat the training-inference cycle until satisfied</li>
+</ul>
+</div>
+</section>
+<section id="batching-python-scripts" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="batching-python-scripts">Batching Python scripts</h2>
+<ul>
+<li>So far we have submitted shell scripts/commands
+<ul>
+<li>essentially using the command-line interface of SLEAP</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>We can also submit Python scripts
+<ul>
+<li>using the Python API of SLEAP</li>
+<li>or any custom Python code</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="ex">$</span> cd swc-hpc-pose-estimation/SLEAP/scripts</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="ex">infer_script.sbatch</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="ex">run_sleap_training.py</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="ex">sleap_topdown_trainer.py</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="ex">train_script.sbatch</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="ex">train_script_python.sbatch</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="ex">train_script_python_array.sbatch</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="example-python-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="example-python-script">Example Python script</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>run_sleap_training.py</strong></pre>
+</div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">import</span> argparse</span>
+<span id="cb15-2"><a href="#cb15-2"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="im">from</span> sleap_topdown_trainer <span class="im">import</span> SLEAPTrainer_TopDown_SingleInstance</span>
+<span id="cb15-4"><a href="#cb15-4"></a></span>
+<span id="cb15-5"><a href="#cb15-5"></a>TEST_DATA_DIR <span class="op">=</span> Path(<span class="st">"/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data"</span>)</span>
+<span id="cb15-6"><a href="#cb15-6"></a></span>
+<span id="cb15-7"><a href="#cb15-7"></a></span>
+<span id="cb15-8"><a href="#cb15-8"></a><span class="kw">def</span> main(batch_size<span class="op">=</span><span class="dv">4</span>):</span>
+<span id="cb15-9"><a href="#cb15-9"></a>    <span class="co">"""Train SLEAP model with variable batch size."""</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a>    ...</span>
+<span id="cb15-11"><a href="#cb15-11"></a></span>
+<span id="cb15-12"><a href="#cb15-12"></a></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb15-14"><a href="#cb15-14"></a>    parser <span class="op">=</span> argparse.ArgumentParser(</span>
+<span id="cb15-15"><a href="#cb15-15"></a>        description<span class="op">=</span><span class="st">"Train SLEAP model with variable batch size."</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a>    )</span>
+<span id="cb15-17"><a href="#cb15-17"></a>    parser.add_argument(</span>
+<span id="cb15-18"><a href="#cb15-18"></a>        <span class="st">"--batch-size"</span>,</span>
+<span id="cb15-19"><a href="#cb15-19"></a>        <span class="st">"--batch_size"</span>,</span>
+<span id="cb15-20"><a href="#cb15-20"></a>        <span class="st">"-b"</span>,</span>
+<span id="cb15-21"><a href="#cb15-21"></a>        <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>,</span>
+<span id="cb15-22"><a href="#cb15-22"></a>        default<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb15-23"><a href="#cb15-23"></a>        dest<span class="op">=</span><span class="st">"batch_size"</span>,</span>
+<span id="cb15-24"><a href="#cb15-24"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">"Batch size for training (default: 4)"</span>,</span>
+<span id="cb15-25"><a href="#cb15-25"></a>    )</span>
+<span id="cb15-26"><a href="#cb15-26"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb15-27"><a href="#cb15-27"></a>    main(batch_size<span class="op">=</span>args.batch_size)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="example-batch-script" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="example-batch-script">Example batch script</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>train_script_python.sbatch</strong></pre>
+</div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a></span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a><span class="co">#SBATCH -t 0-04:00 # time (D-HH:MM)</span></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="co">#SBATCH --gres gpu:1 # request 1 GPU (of any kind)</span></span>
+<span id="cb16-9"><a href="#cb16-9"></a><span class="co">#SBATCH -o slurm.%N.%j.out # STDOUT</span></span>
+<span id="cb16-10"><a href="#cb16-10"></a><span class="co">#SBATCH -e slurm.%N.%j.err # STDERR</span></span>
+<span id="cb16-11"><a href="#cb16-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
+<span id="cb16-12"><a href="#cb16-12"></a><span class="co">#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk</span></span>
+<span id="cb16-13"><a href="#cb16-13"></a></span>
+<span id="cb16-14"><a href="#cb16-14"></a><span class="co"># Load the SLEAP module</span></span>
+<span id="cb16-15"><a href="#cb16-15"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb16-16"><a href="#cb16-16"></a></span>
+<span id="cb16-17"><a href="#cb16-17"></a><span class="co"># Define directory for Python scripts</span></span>
+<span id="cb16-18"><a href="#cb16-18"></a><span class="va">DATA_DIR</span><span class="op">=</span>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb16-19"><a href="#cb16-19"></a><span class="va">CODE_DIR</span><span class="op">=</span><span class="va">$DATA_DIR</span>/swc-hpc-pose-estimation/SLEAP/scripts</span>
+<span id="cb16-20"><a href="#cb16-20"></a><span class="bu">cd</span> <span class="va">$CODE_DIR</span></span>
+<span id="cb16-21"><a href="#cb16-21"></a></span>
+<span id="cb16-22"><a href="#cb16-22"></a><span class="co"># Run the Python script (for batch size 4)</span></span>
+<span id="cb16-23"><a href="#cb16-23"></a><span class="ex">python</span> run_sleap_training.py <span class="at">--batch-size</span> 4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="array-jobs" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="array-jobs">Array jobs</h2>
+<p>What if we want to run the previous script for multiple batch sizes?</p>
+<div class="fragment">
+<p><strong>Solution:</strong> submit an array job</p>
+<div class="quarto-figure quarto-figure-left">
+<figure class="figure">
+<p><img src="diagrams/array-jobs.svg" class="img-fluid figure-img" width="500"></p>
+</figure>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>the jobs will run in parallel if there are enough resources</li>
+<li>otherwise, they will be scheduled to run sequentially</li>
+</ul>
+</div>
+</section>
+<section id="example-array-job" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="example-array-job">Example array job</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>train_script_python_array.sbatch</strong></pre>
+</div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a><span class="co">#SBATCH -t 0-04:00 # time (D-HH:MM)</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a><span class="co">#SBATCH --gres gpu:rtx2080:1 # request specific GPU type (rtx2080)</span></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="co">#SBATCH -o slurm.%N.%j.out # STDOUT</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="co">#SBATCH -e slurm.%N.%j.err # STDERR</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
+<span id="cb17-12"><a href="#cb17-12"></a><span class="co">#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk</span></span>
+<span id="cb17-13"><a href="#cb17-13"></a><span class="co">#SBATCH --array=1-3</span></span>
+<span id="cb17-14"><a href="#cb17-14"></a></span>
+<span id="cb17-15"><a href="#cb17-15"></a><span class="co"># Load the SLEAP module</span></span>
+<span id="cb17-16"><a href="#cb17-16"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb17-17"><a href="#cb17-17"></a></span>
+<span id="cb17-18"><a href="#cb17-18"></a><span class="co"># Define directory for Python scripts</span></span>
+<span id="cb17-19"><a href="#cb17-19"></a><span class="va">DATA_DIR</span><span class="op">=</span>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb17-20"><a href="#cb17-20"></a><span class="va">CODE_DIR</span><span class="op">=</span><span class="va">$DATA_DIR</span>/swc-hpc-pose-estimation/SLEAP/scripts</span>
+<span id="cb17-21"><a href="#cb17-21"></a><span class="bu">cd</span> <span class="va">$CODE_DIR</span></span>
+<span id="cb17-22"><a href="#cb17-22"></a></span>
+<span id="cb17-23"><a href="#cb17-23"></a><span class="co"># Run the Python script across batch sizes 2, 4, 8</span></span>
+<span id="cb17-24"><a href="#cb17-24"></a><span class="va">ARGS</span><span class="op">=</span><span class="va">(</span>2 4 8<span class="va">)</span></span>
+<span id="cb17-25"><a href="#cb17-25"></a><span class="ex">python</span> run_sleap_training.py <span class="at">--batch-size</span> <span class="st">"</span><span class="va">${ARGS</span><span class="op">[</span><span class="va">$SLURM_ARRAY_TASK_ID</span><span class="op">]</span><span class="va">}</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="useful-links" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="useful-links">Useful links</h2>
+<section id="pose-estimation-1" class="level4">
+<h4 class="anchored" data-anchor-id="pose-estimation-1">Pose estimation</h4>
+<ul>
+<li><a href="https://doi.org/10.1038/s41593-020-00734-z">Quantifying behavior to understand the brain</a></li>
+<li><a href="https://sleap.ai/">SLEAP</a></li>
+<li><a href="http://www.mackenziemathislab.org/deeplabcut">DeepLabCut</a></li>
+</ul>
+</section>
+<section id="swc-wiki" class="level4">
+<h4 class="anchored" data-anchor-id="swc-wiki">SWC wiki</h4>
+<ul>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/Overview+of+SLURM+job+scheduler">Overview of SLURM job scheduler</a></li>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/Logging+into+the+Cluster">Logging into the Cluster</a></li>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture">CPU and GPU Platform Architecture</a></li>
+<li><a href="https://wiki.ucl.ac.uk/display/SSC/Linux+Environment+Modules">Linux Environment Modules</a></li>
+</ul>
+</section>
+</section>
+<section id="acknowledgements" class="level2 smaller">
+<h2 class="smaller anchored" data-anchor-id="acknowledgements">Acknowledgements</h2>
+<ul>
+<li>Alex Martin (setting up HPC modules)</li>
+<li>Loukia Katsouri (mouse videos)</li>
+<li>Laura Schwarz and Tom Hagley (SLEAP workflow)</li>
+<li>Chang Huan Lo (SLEAP Python code)</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,512 @@
+---
+title: Pose estimation with SLEAP
+subtitle: Introduction to HPC with Linux | 2023-05-15
+author: Niko Sirmpilatze | Neuroinformatics Unit
+format:
+    revealjs:
+        theme: [default, niu-light.scss]
+        logo: img/logo_niu_light.png
+        slide-number: c
+        menu:
+            numbers: true
+        chalkboard: true
+        scrollable: true
+        preview-links: false
+        view-distance: 10
+        mobile-view-distance: 10
+        auto-animate: true
+        auto-play-media: true
+        code-overflow: wrap
+        highlight-style: atom-one
+---
+
+## Course materials {.smaller}
+
+#### Sample data
+`/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data`
+
+- Mouse videos (from [Loukia Katsouri](https://www.sainsburywellcome.org/web/people/loukia-katsouri))
+- SLEAP project with:
+  - labelled frames
+  - trained models
+  - prediction results
+
+#### Github repository
+[github.com/neuroinformatics-unit/swc-hpc-pose-estimation](https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation)
+
+- This presentation
+- Example scripts
+- Detailed "How To" guide
+
+## Tracking animals in videos {.smaller}
+
+:::: {.columns}
+
+::: {.column width="60%"}
+![source: [doi.org/10.1038/s41593-020-00734-z](https://doi.org/10.1038/s41593-020-00734-z)](img/tracking_types.png){fig-align=center height=500}
+:::
+
+::::
+
+## Pose estimation {.smaller}
+![source: [doi.org/10.1038/s41593-020-00734-z](https://doi.org/10.1038/s41593-020-00734-z)](img/pose_estimation_2D.png){.r-stretch fig-align=left}
+
+## Existing tools
+
+:::: {.columns}
+
+::: {.column width="35%"}
+- [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
+- [SLEAP](https://sleap.ai/)
+- Many others:
+  - OpenPose
+  - DeepPoseKit
+  - Anipose
+  - Freipose
+  - ...
+:::
+
+::: {.column width="65%"}
+![](img/sleap_movie.gif)
+:::
+
+::::
+
+## SLEAP workflow
+
+![](diagrams/pose-estimation.svg){fig-align=center width=600}
+
+::: {.fragment}
+- Training and inference are GPU-intensive
+- We can delegate to the HPC cluster's GPU nodes
+:::
+
+## Label body parts {.smaller}
+
+- Annotate frames using the `sleap-label` GUI on your PC/laptop
+- Save project (e.g. `labels.v001.slp`)
+
+![](img/sleap-label_screenshot.png)
+
+## Configure training {.smaller}
+
+- In the `sleap-label` GUI: `Predict/Run Training...`
+
+![](img/sleap-train_config.png)
+
+- When ready, `Export training job package...`
+
+## Training job package contents
+
+`labels.v001.slp.training_job.zip` => unzip
+
+```{.bash code-line-numbers=false}
+# Copy of labelled frames
+labels.v001.pkg.slp
+
+# Model configuration files
+centroid.json
+centered_instance.json
+
+# Bash scripts for running training and inference
+train_script.sh
+inference_script.sh
+
+# Summary of all jobs
+jobs.yaml
+```
+
+## Top-down vs bottom-up {.smaller}
+
+![](img/pose_estimation_topdown.png){fig-align=left height=220}
+
+::: {.fragment}
+![source: [doi.org/10.1038/s41593-020-00734-z](https://doi.org/10.1038/s41593-020-00734-z)](img/pose_estimation_bottomup.png){fig-align=left height=220}
+:::
+
+## Finding our project on the HPC
+
+```{.bash code-line-numbers="1-3|5-8|10-12|14-15"}
+# Logging into the HPC cluster
+ssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk # Provide password
+ssh hpc-gw1 # Provide password again
+
+# Navigate to your SLEAP project
+cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+# Check the contents of your folder
+ls -l
+
+# Go inside the exported training package
+cd labels.v001.slp.training_job
+ls -l
+
+# View the contents of train-script.sh
+cat train-script.sh
+```
+
+::: {.fragment}
+```{.bash filename="train-script.sh"}
+#!/bin/bash
+sleap-train centroid.json labels.v001.pkg.slp
+sleap-train centered_instance.json labels.v001.pkg.slp
+```
+:::
+
+## Get SLURM to run the script {.smaller}
+
+::: {.panel-tabset}
+
+### Interactive
+Suitable for debugging (immediate feedback)
+
+- Start an interactive job with one GPU
+  ```{.bash code-line-numbers=false}
+  srun -p gpu --gres=gpu:1 --pty bash -i
+  ```
+- Execute commands one-by-one, e.g.:
+  ```{.bash code-line-numbers=false}
+  module load SLEAP
+  cd <MY-TRAINING-DIRECTORY>
+  bash train-script.sh
+
+  # Stop the session
+  exit
+  ```
+
+### Batch
+Main method for submitting jobs
+
+- Prepare a batch script, e.g. `train_script.sbatch`
+- Submit the job:
+  ```{.bash code-line-numbers=false}
+  sbatch train_script.sbatch
+  ```
+- Monitor job status: 
+  ```{.bash code-line-numbers=false}
+  squeue -u <SWC-USERNAME>
+  ```
+
+### Array batch
+Useful for submitting many similar jobs
+
+- Write a batch script
+- Execute the script over an array of inputs in parallel
+:::
+
+## Get the example scripts
+
+```{.bash code-line-numbers="1-3|4-12|10,14,15"}
+# Clone the GitHub repository
+$ git clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git
+
+# List the available scripts for SLEAP
+$ cd swc-hpc-pose-estimation/SLEAP/scripts
+$ ls -1
+infer_script.sbatch
+run_sleap_training.py
+sleap_topdown_trainer.py
+train_script.sbatch
+train_script_python.sbatch
+train_script_python_array.sbatch
+
+# View the contents of the SLURM train script
+cat train_script.sbatch
+```
+
+## Batch script for training {.smaller}
+
+```{.bash filename="train_script.sbatch" code-line-numbers="1-12|13-24"}
+#!/bin/bash
+
+#SBATCH -p gpu # partition (queue)
+#SBATCH -N 1   # number of nodes
+#SBATCH --mem 12G # memory pool for all cores
+#SBATCH -n 2 # number of cores
+#SBATCH -t 0-04:00 # time (D-HH:MM)
+#SBATCH --gres gpu:1 # request 1 GPU (of any kind)
+#SBATCH -o slurm.%N.%j.out # STDOUT
+#SBATCH -e slurm.%N.%j.err # STDERR
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
+
+# Load the SLEAP module
+module load SLEAP
+
+# Define directories for data and exported training job
+DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+JOB_DIR=$DATA_DIR/labels.v001.slp.training_job
+# Go to the job directory
+cd $JOB_DIR
+
+# Run the training script generated by SLEAP
+./train-script.sh
+```
+
+## Submit and monitor batch script {.smaller}
+
+```{.bash code-line-numbers="1-3|5-9|10-16|17-19"}
+# Submit job
+$ sbatch train_script.sbatch
+Submitted batch job 3445652
+
+# View status of queued/running jobs
+$ squeue -u <SWC-USERNAME>
+JOBID    PARTITION  NAME     USER      ST  TIME   NODES  NODELIST(REASON)
+3445652  gpu        slurm_ba sirmpila  R   23:11  1      gpu-sr670-20
+
+# View status of running/completed jobs
+$ sacct -u <SWC-USERNAME>
+JobID           JobName  Partition    Account  AllocCPUS      State ExitCode 
+------------ ---------- ---------- ---------- ---------- ---------- -------- 
+3445652      slurm_bat+        gpu     swc-ac          2  COMPLETED      0:0 
+3445652.bat+      batch                swc-ac          2  COMPLETED      0:0
+
+# View the contents of standard output and error
+$ cat slurm.gpu-sr670-20.3445652.out
+$ cat slurm.gpu-sr670-20.3445652.err
+```
+
+## Check trained models {.smaller}
+
+```{.bash code-line-numbers="1-6|7-19"}
+$ cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+$ cd labels.v001.slp.training_job
+$ cd models
+$ ls -1
+230509_141357.centered_instance
+230509_141357.centroid
+
+$ cd 230509_141357.centered_instance
+$ ls -1
+best_model.h5
+initial_config.json
+labels_gt.train.slp
+labels_gt.val.slp
+labels_pr.train.slp
+labels_pr.val.slp
+metrics.train.npz
+metrics.val.npz
+training_config.json
+training_log.csv
+```
+
+::: {.fragment}
+- View evaluation metrics with the `sleap-label` GUI on your PC/laptop
+- `Predict/Evaluation Metrics for Trained Models...`
+:::
+
+## Batch script for inference {.smaller}
+
+```{.bash filename="infer_script.sbatch" code-line-numbers="|25-33"}
+#!/bin/bash
+
+#SBATCH -p gpu # partition (queue)
+#SBATCH -N 1   # number of nodes
+#SBATCH --mem 12G # memory pool for all cores
+#SBATCH -n 2 # number of cores
+#SBATCH -t 0-01:00 # time (D-HH:MM)
+#SBATCH --gres gpu:1 # request 1 GPU (of any kind)
+#SBATCH -o slurm.%N.%j.out # STDOUT
+#SBATCH -e slurm.%N.%j.err # STDERR
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=n.sirmpilatze@@ucl.ac.uk
+
+# Load the SLEAP module
+module load SLEAP
+
+# Define data directory
+DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+# Define exported job directory
+JOB_DIR=$DATA_DIR/labels.v001.slp.training_job
+
+# Go to the job directory
+cd $JOB_DIR
+
+# Run the inference command
+sleap-track $DATA_DIR/videos/M708149_EPM_20200317_165049331-converted.mp4 \
+    -m $JOB_DIR/models/230509_141357.centroid/training_config.json \
+    -m $JOB_DIR/models/230509_141357.centered_instance/training_config.json \
+    --gpu auto \
+    --tracking.tracker none \
+    -o labels.v001.slp.predictions.slp \
+    --verbosity json \
+    --no-empty-frames
+```
+
+## Check the predictions {.smaller}
+
+```{.bash code-line-numbers="1,2,3,9"}
+$ cd /ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+$ cd labels.v001.slp.training_job
+$ ls -1
+centered_instance.json
+centroid.json
+inference-script.sh
+jobs.yaml
+labels.v001.pkg.slp
+labels.v001.slp.predictions.slp
+models
+train-script.sh
+```
+
+::: {.fragment}
+- Inspect the predictions with the `sleap-label` GUI on your PC/laptop
+:::
+
+## The training - inference cycle
+
+::: {.incremental}
+- Correct some of the predictions: see [Prediction-assisted labeling](https://sleap.ai/tutorials/assisted-labeling.html)
+- Merge corrected labels into the initial training set: see [Merging guide](https://sleap.ai/guides/merging.html)
+- Save the merged training set as`labels.v002.slp`
+- Export a new training job `labels.v002.slp.training_job` (you may reuse the training configurations from `v001`)
+- Repeat the training-inference cycle until satisfied
+:::
+
+## Batching Python scripts {.smaller}
+
+* So far we have submitted shell scripts/commands
+  * essentially using the command-line interface of SLEAP
+
+::: {.fragment}
+* We can also submit Python scripts
+  * using the Python API of SLEAP
+  * or any custom Python code
+:::
+
+::: {.fragment}
+```{.bash code-line-numbers="4,5"}
+$ cd swc-hpc-pose-estimation/SLEAP/scripts
+$ ls -1
+infer_script.sbatch
+run_sleap_training.py
+sleap_topdown_trainer.py
+train_script.sbatch
+train_script_python.sbatch
+train_script_python_array.sbatch
+```
+:::
+
+## Example Python script {.smaller}
+```{.python filename="run_sleap_training.py" code-line-numbers="1-9|13-27"}
+import argparse
+from pathlib import Path
+from sleap_topdown_trainer import SLEAPTrainer_TopDown_SingleInstance
+
+TEST_DATA_DIR = Path("/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data")
+
+
+def main(batch_size=4):
+    """Train SLEAP model with variable batch size."""
+    ...
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Train SLEAP model with variable batch size."
+    )
+    parser.add_argument(
+        "--batch-size",
+        "--batch_size",
+        "-b",
+        type=int,
+        default=4,
+        dest="batch_size",
+        help="Batch size for training (default: 4)",
+    )
+    args = parser.parse_args()
+    main(batch_size=args.batch_size)
+```
+
+## Example batch script {.smaller}
+
+```{.bash filename="train_script_python.sbatch" code-line-numbers="17-23"}
+#!/bin/bash
+
+#SBATCH -p gpu # partition (queue)
+#SBATCH -N 1   # number of nodes
+#SBATCH --mem 12G # memory pool for all cores
+#SBATCH -n 2 # number of cores
+#SBATCH -t 0-04:00 # time (D-HH:MM)
+#SBATCH --gres gpu:1 # request 1 GPU (of any kind)
+#SBATCH -o slurm.%N.%j.out # STDOUT
+#SBATCH -e slurm.%N.%j.err # STDERR
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
+
+# Load the SLEAP module
+module load SLEAP
+
+# Define directory for Python scripts
+DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+CODE_DIR=$DATA_DIR/swc-hpc-pose-estimation/SLEAP/scripts
+cd $CODE_DIR
+
+# Run the Python script (for batch size 4)
+python run_sleap_training.py --batch-size 4
+```
+
+## Array jobs {.smaller}
+
+What if we want to run the previous script for multiple batch sizes?
+
+::: {.fragment}
+**Solution:** submit an array job
+
+![](diagrams/array-jobs.svg){fig-align=left width=500}
+:::
+
+::: {.fragment}
+- the jobs will run in parallel if there are enough resources
+- otherwise, they will be scheduled to run sequentially
+:::
+
+## Example array job {.smaller}
+
+```{.bash filename="train_script_python_array.sbatch" code-line-numbers="8|13|23-25"}
+#!/bin/bash
+
+#SBATCH -p gpu # partition (queue)
+#SBATCH -N 1   # number of nodes
+#SBATCH --mem 12G # memory pool for all cores
+#SBATCH -n 2 # number of cores
+#SBATCH -t 0-04:00 # time (D-HH:MM)
+#SBATCH --gres gpu:rtx2080:1 # request specific GPU type (rtx2080)
+#SBATCH -o slurm.%N.%j.out # STDOUT
+#SBATCH -e slurm.%N.%j.err # STDERR
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
+#SBATCH --array=1-3
+
+# Load the SLEAP module
+module load SLEAP
+
+# Define directory for Python scripts
+DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
+CODE_DIR=$DATA_DIR/swc-hpc-pose-estimation/SLEAP/scripts
+cd $CODE_DIR
+
+# Run the Python script across batch sizes 2, 4, 8
+ARGS=(2 4 8)
+python run_sleap_training.py --batch-size "${ARGS[$SLURM_ARRAY_TASK_ID]}"
+```
+
+## Useful links {.smaller}
+
+#### Pose estimation
+- [Quantifying behavior to understand the brain](https://doi.org/10.1038/s41593-020-00734-z)
+- [SLEAP](https://sleap.ai/)
+- [DeepLabCut](http://www.mackenziemathislab.org/deeplabcut)
+
+#### SWC wiki
+- [Overview of SLURM job scheduler](https://wiki.ucl.ac.uk/display/SSC/Overview+of+SLURM+job+scheduler)
+- [Logging into the Cluster](https://wiki.ucl.ac.uk/display/SSC/Logging+into+the+Cluster)
+- [CPU and GPU Platform Architecture](https://wiki.ucl.ac.uk/display/SSC/CPU+and+GPU+Platform+architecture)
+- [Linux Environment Modules](https://wiki.ucl.ac.uk/display/SSC/Linux+Environment+Modules)
+
+## Acknowledgements {.smaller}
+
+* Alex Martin (setting up HPC modules)
+* Loukia Katsouri (mouse videos)
+* Laura Schwarz and Tom Hagley (SLEAP workflow)
+* Chang Huan Lo (SLEAP Python code)
