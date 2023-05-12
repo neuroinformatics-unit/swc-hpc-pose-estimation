@@ -387,6 +387,9 @@
       margin-right: 0; 
     }
   </style>
+  <script src="presentation_files/libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="presentation_files/libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="presentation_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -575,9 +578,9 @@ Niko Sirmpilatze
 <div id="tabset-1-2">
 <p>Main method for submitting jobs</p>
 <ul>
-<li><p>Prepare a batch script, e.g.&nbsp;<code>slurm_train_script.sh</code></p></li>
+<li><p>Prepare a batch script, e.g.&nbsp;<code>train_script.sbatch</code></p></li>
 <li><p>Submit the job:</p>
-<div class="sourceCode" id="cb6" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> slurm_train_script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb6" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> train_script.sbatch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p>Monitor job status:</p>
 <div class="sourceCode" id="cb7" data-code-line-numbers="false"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">squeue</span> <span class="at">-u</span> <span class="op">&lt;</span>SWC-USERNAME<span class="op">&gt;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ul>
@@ -594,25 +597,27 @@ Niko Sirmpilatze
 </section>
 <section id="get-the-example-scripts" class="slide level2">
 <h2>Get the example scripts</h2>
-<div class="sourceCode" id="cb8" data-code-line-numbers="1-3|4-10|11-13"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Clone the GitHub repository</span></span>
+<div class="sourceCode" id="cb8" data-code-line-numbers="1-3|4-12|10,14,15"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Clone the GitHub repository</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a><span class="ex">$</span> git clone https://github.com/neuroinformatics-unit/swc-hpc-pose-estimation.git</span>
 <span id="cb8-3"><a href="#cb8-3"></a></span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="co"># List the available scripts for SLEAP</span></span>
 <span id="cb8-5"><a href="#cb8-5"></a><span class="ex">$</span> cd swc-hpc-pose-estimation/SLEAP/scripts</span>
 <span id="cb8-6"><a href="#cb8-6"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
-<span id="cb8-7"><a href="#cb8-7"></a><span class="ex">run_sleap_training.py</span></span>
-<span id="cb8-8"><a href="#cb8-8"></a><span class="ex">sleap_topdown_trainer.py</span></span>
-<span id="cb8-9"><a href="#cb8-9"></a><span class="ex">slurm_infer_script.sh</span></span>
-<span id="cb8-10"><a href="#cb8-10"></a><span class="ex">slurm_train_script.sh</span></span>
-<span id="cb8-11"><a href="#cb8-11"></a></span>
-<span id="cb8-12"><a href="#cb8-12"></a><span class="co"># View the contents of the SLURM train script</span></span>
-<span id="cb8-13"><a href="#cb8-13"></a><span class="fu">cat</span> slurm_train_script.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-7"><a href="#cb8-7"></a><span class="ex">infer_script.sbatch</span></span>
+<span id="cb8-8"><a href="#cb8-8"></a><span class="ex">run_sleap_training.py</span></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="ex">sleap_topdown_trainer.py</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a><span class="ex">train_script.sbatch</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a><span class="ex">train_script_python.sbatch</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a><span class="ex">train_script_python_array.sbatch</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a></span>
+<span id="cb8-14"><a href="#cb8-14"></a><span class="co"># View the contents of the SLURM train script</span></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="fu">cat</span> train_script.sbatch</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="batch-script-for-training" class="slide level2 smaller">
 <h2>Batch script for training</h2>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>slurm_train_script.sh</strong></pre>
+<pre><strong>train_script.sbatch</strong></pre>
 </div>
 <div class="sourceCode" id="cb9" data-code-line-numbers="1-12|13-24"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1"></a><span class="co">#!/bin/bash</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a></span>
@@ -643,7 +648,7 @@ Niko Sirmpilatze
 <section id="submit-and-monitor-batch-script" class="slide level2 smaller">
 <h2>Submit and monitor batch script</h2>
 <div class="sourceCode" id="cb10" data-code-line-numbers="1-3|5-9|10-16|17-19"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Submit job</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="ex">$</span> sbatch slurm_train_script.sh</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="ex">$</span> sbatch train_script.sbatch</span>
 <span id="cb10-3"><a href="#cb10-3"></a><span class="ex">Submitted</span> batch job 3445652</span>
 <span id="cb10-4"><a href="#cb10-4"></a></span>
 <span id="cb10-5"><a href="#cb10-5"></a><span class="co"># View status of queued/running jobs</span></span>
@@ -694,7 +699,7 @@ Niko Sirmpilatze
 <h2>Batch script for inference</h2>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>slurm_infer_script.sh</strong></pre>
+<pre><strong>infer_script.sbatch</strong></pre>
 </div>
 <div class="sourceCode" id="cb12" data-code-line-numbers="|25-33"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1"></a><span class="co">#!/bin/bash</span></span>
 <span id="cb12-2"><a href="#cb12-2"></a></span>
@@ -765,9 +770,9 @@ Niko Sirmpilatze
 <section id="batching-python-scripts" class="slide level2 smaller">
 <h2>Batching Python scripts</h2>
 <ul>
-<li>So far we have submitted shell scripts
+<li>So far we have submitted shell scripts/commands
 <ul>
-<li>essentaiily using the command-line interface of SLEAP</li>
+<li>essentially using the command-line interface of SLEAP</li>
 </ul></li>
 </ul>
 <div class="fragment">
@@ -780,19 +785,21 @@ Niko Sirmpilatze
 </ul>
 </div>
 <div class="fragment">
-<div class="sourceCode" id="cb14" data-code-line-numbers="3,4"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="ex">$</span> cd swc-hpc-pose-estimation/SLEAP/scripts</span>
+<div class="sourceCode" id="cb14" data-code-line-numbers="4,5"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1"></a><span class="ex">$</span> cd swc-hpc-pose-estimation/SLEAP/scripts</span>
 <span id="cb14-2"><a href="#cb14-2"></a><span class="ex">$</span> ls <span class="at">-1</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="ex">run_sleap_training.py</span></span>
-<span id="cb14-4"><a href="#cb14-4"></a><span class="ex">sleap_topdown_trainer.py</span></span>
-<span id="cb14-5"><a href="#cb14-5"></a><span class="ex">slurm_infer_script.sh</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a><span class="ex">slurm_train_script.sh</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="ex">infer_script.sbatch</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="ex">run_sleap_training.py</span></span>
+<span id="cb14-5"><a href="#cb14-5"></a><span class="ex">sleap_topdown_trainer.py</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a><span class="ex">train_script.sbatch</span></span>
+<span id="cb14-7"><a href="#cb14-7"></a><span class="ex">train_script_python.sbatch</span></span>
+<span id="cb14-8"><a href="#cb14-8"></a><span class="ex">train_script_python_array.sbatch</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="example-python-script" class="slide level2 smaller">
 <h2>Example Python script</h2>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>run_sleap_training</strong></pre>
+<pre><strong>run_sleap_training.py</strong></pre>
 </div>
 <div class="sourceCode" id="cb15" data-code-line-numbers="1-9|28-42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">import</span> argparse</span>
 <span id="cb15-2"><a href="#cb15-2"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -842,9 +849,9 @@ Niko Sirmpilatze
 <h2>Example batch script</h2>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
-<pre><strong>slurm_train_script.sh</strong></pre>
+<pre><strong>train_script_python.sbatch</strong></pre>
 </div>
-<div class="sourceCode" id="cb16" data-code-line-numbers="13-24"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">#!/bin/bash</span></span>
+<div class="sourceCode" id="cb16" data-code-line-numbers="17-24"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">#!/bin/bash</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a></span>
 <span id="cb16-3"><a href="#cb16-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
 <span id="cb16-4"><a href="#cb16-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
@@ -868,6 +875,30 @@ Niko Sirmpilatze
 <span id="cb16-22"><a href="#cb16-22"></a></span>
 <span id="cb16-23"><a href="#cb16-23"></a><span class="co"># Run the Python script (for batch size 4)</span></span>
 <span id="cb16-24"><a href="#cb16-24"></a><span class="ex">python</span> <span class="va">$CODE_DIR</span>/run_sleap_training.py <span class="at">--batch-size</span> 4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="submitting-array-batch-jobs" class="slide level2 smaller">
+<h2>Submitting array batch jobs</h2>
+<p>What if we want to run the same script for multiple batch sizes?</p>
+<p>This will allow us to see how the batch size affects the training.</p>
+<div class="cell" data-reveal="true">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">%%{init: {"theme": "neutral", "fontFamily": "arial", "curve": "linear"} }%%
+
+flowchart LR
+    classDef emphasis fill:#03A062;
+
+    script --&gt;|"batch_size=1"| GPU1["GPU 1"] --&gt; model1["Model 1"]
+    script --&gt;|"batch_size=4"| GPU2GPU1["GPU 2"] --&gt; model2["Model 1"]
+    script --&gt;|"batch_size=8"| GPU3GPU1["GPU 3"] --&gt; model3["Model 1"]
+
+    class script emphasis
+</pre>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="useful-links" class="slide level2 smaller">
