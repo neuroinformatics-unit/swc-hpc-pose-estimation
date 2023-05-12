@@ -149,7 +149,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         max_stride : int
             Maximum stride for UNet backbone. Default is 32.
         """
-        self.centroid_cfg = copy.copy(self.cfg)
+        self.centroid_cfg = self.cfg
         self.centroid_cfg.model.model_type = "centroid"
         self.centroid_cfg.data.preprocessing.input_scaling = input_scaling
         self.centroid_cfg.optimization.epochs = n_epochs
@@ -186,7 +186,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         max_stride : int
             Maximum stride for UNet backbone. Default is 32.
         """
-        self.instance_cfg = copy.copy(self.cfg)
+        self.instance_cfg = self.cfg
         self.instance_cfg.model.model_type = "centered_instance"
         self.instance_cfg.data.preprocessing.input_scaling = input_scaling
         self.instance_cfg.optimization.epochs = n_epochs
