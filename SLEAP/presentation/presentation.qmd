@@ -389,7 +389,7 @@ train_script_python_array.sbatch
 :::
 
 ## Example Python script {.smaller}
-```{.python filename="run_sleap_training.py" code-line-numbers="1-9|28-42"}
+```{.python filename="run_sleap_training.py" code-line-numbers="1-9|13-27"}
 import argparse
 from pathlib import Path
 from sleap_topdown_trainer import SLEAPTrainer_TopDown_SingleInstance
@@ -398,22 +398,7 @@ TEST_DATA_DIR = Path("/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
 
 
 def main(batch_size=4):
-    """Train SLEAP model with variable batch size.
-
-    This functions runs a SLEAP training job using the
-    SLEAPTrainer_TopDown_SingleInstance class from
-    `sleap_topdown_trainer.py`, which should be located in the same
-    directory as this script. SLEAPTrainer_TopDown_SingleInstance
-    is a convenience class for training top-down SLEAP models on
-    single instance data.
-    
-    Parameters
-    ----------
-    batch_size : int
-        Batch size for training. Default is 4.
-        Applies to both centroid and centered instance models
-        of the top-down configuration.
-    """
+    """Train SLEAP model with variable batch size."""
     ...
 
 

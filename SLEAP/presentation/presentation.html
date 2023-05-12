@@ -798,7 +798,7 @@ Niko Sirmpilatze
 <div class="code-with-filename-file">
 <pre><strong>run_sleap_training.py</strong></pre>
 </div>
-<div class="sourceCode" id="cb15" data-code-line-numbers="1-9|28-42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">import</span> argparse</span>
+<div class="sourceCode" id="cb15" data-code-line-numbers="1-9|13-27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a><span class="im">import</span> argparse</span>
 <span id="cb15-2"><a href="#cb15-2"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb15-3"><a href="#cb15-3"></a><span class="im">from</span> sleap_topdown_trainer <span class="im">import</span> SLEAPTrainer_TopDown_SingleInstance</span>
 <span id="cb15-4"><a href="#cb15-4"></a></span>
@@ -806,40 +806,25 @@ Niko Sirmpilatze
 <span id="cb15-6"><a href="#cb15-6"></a></span>
 <span id="cb15-7"><a href="#cb15-7"></a></span>
 <span id="cb15-8"><a href="#cb15-8"></a><span class="kw">def</span> main(batch_size<span class="op">=</span><span class="dv">4</span>):</span>
-<span id="cb15-9"><a href="#cb15-9"></a>    <span class="co">"""Train SLEAP model with variable batch size.</span></span>
-<span id="cb15-10"><a href="#cb15-10"></a></span>
-<span id="cb15-11"><a href="#cb15-11"></a><span class="co">    This functions runs a SLEAP training job using the</span></span>
-<span id="cb15-12"><a href="#cb15-12"></a><span class="co">    SLEAPTrainer_TopDown_SingleInstance class from</span></span>
-<span id="cb15-13"><a href="#cb15-13"></a><span class="co">    `sleap_topdown_trainer.py`, which should be located in the same</span></span>
-<span id="cb15-14"><a href="#cb15-14"></a><span class="co">    directory as this script. SLEAPTrainer_TopDown_SingleInstance</span></span>
-<span id="cb15-15"><a href="#cb15-15"></a><span class="co">    is a convenience class for training top-down SLEAP models on</span></span>
-<span id="cb15-16"><a href="#cb15-16"></a><span class="co">    single instance data.</span></span>
-<span id="cb15-17"><a href="#cb15-17"></a><span class="co">    </span></span>
-<span id="cb15-18"><a href="#cb15-18"></a><span class="co">    Parameters</span></span>
-<span id="cb15-19"><a href="#cb15-19"></a><span class="co">    ----------</span></span>
-<span id="cb15-20"><a href="#cb15-20"></a><span class="co">    batch_size : int</span></span>
-<span id="cb15-21"><a href="#cb15-21"></a><span class="co">        Batch size for training. Default is 4.</span></span>
-<span id="cb15-22"><a href="#cb15-22"></a><span class="co">        Applies to both centroid and centered instance models</span></span>
-<span id="cb15-23"><a href="#cb15-23"></a><span class="co">        of the top-down configuration.</span></span>
-<span id="cb15-24"><a href="#cb15-24"></a><span class="co">    """</span></span>
-<span id="cb15-25"><a href="#cb15-25"></a>    ...</span>
-<span id="cb15-26"><a href="#cb15-26"></a></span>
-<span id="cb15-27"><a href="#cb15-27"></a></span>
-<span id="cb15-28"><a href="#cb15-28"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
-<span id="cb15-29"><a href="#cb15-29"></a>    parser <span class="op">=</span> argparse.ArgumentParser(</span>
-<span id="cb15-30"><a href="#cb15-30"></a>        description<span class="op">=</span><span class="st">"Train SLEAP model with variable batch size."</span></span>
-<span id="cb15-31"><a href="#cb15-31"></a>    )</span>
-<span id="cb15-32"><a href="#cb15-32"></a>    parser.add_argument(</span>
-<span id="cb15-33"><a href="#cb15-33"></a>        <span class="st">"--batch-size"</span>,</span>
-<span id="cb15-34"><a href="#cb15-34"></a>        <span class="st">"--batch_size"</span>,</span>
-<span id="cb15-35"><a href="#cb15-35"></a>        <span class="st">"-b"</span>,</span>
-<span id="cb15-36"><a href="#cb15-36"></a>        <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>,</span>
-<span id="cb15-37"><a href="#cb15-37"></a>        default<span class="op">=</span><span class="dv">4</span>,</span>
-<span id="cb15-38"><a href="#cb15-38"></a>        dest<span class="op">=</span><span class="st">"batch_size"</span>,</span>
-<span id="cb15-39"><a href="#cb15-39"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">"Batch size for training (default: 4)"</span>,</span>
-<span id="cb15-40"><a href="#cb15-40"></a>    )</span>
-<span id="cb15-41"><a href="#cb15-41"></a>    args <span class="op">=</span> parser.parse_args()</span>
-<span id="cb15-42"><a href="#cb15-42"></a>    main(batch_size<span class="op">=</span>args.batch_size)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-9"><a href="#cb15-9"></a>    <span class="co">"""Train SLEAP model with variable batch size."""</span></span>
+<span id="cb15-10"><a href="#cb15-10"></a>    ...</span>
+<span id="cb15-11"><a href="#cb15-11"></a></span>
+<span id="cb15-12"><a href="#cb15-12"></a></span>
+<span id="cb15-13"><a href="#cb15-13"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb15-14"><a href="#cb15-14"></a>    parser <span class="op">=</span> argparse.ArgumentParser(</span>
+<span id="cb15-15"><a href="#cb15-15"></a>        description<span class="op">=</span><span class="st">"Train SLEAP model with variable batch size."</span></span>
+<span id="cb15-16"><a href="#cb15-16"></a>    )</span>
+<span id="cb15-17"><a href="#cb15-17"></a>    parser.add_argument(</span>
+<span id="cb15-18"><a href="#cb15-18"></a>        <span class="st">"--batch-size"</span>,</span>
+<span id="cb15-19"><a href="#cb15-19"></a>        <span class="st">"--batch_size"</span>,</span>
+<span id="cb15-20"><a href="#cb15-20"></a>        <span class="st">"-b"</span>,</span>
+<span id="cb15-21"><a href="#cb15-21"></a>        <span class="bu">type</span><span class="op">=</span><span class="bu">int</span>,</span>
+<span id="cb15-22"><a href="#cb15-22"></a>        default<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb15-23"><a href="#cb15-23"></a>        dest<span class="op">=</span><span class="st">"batch_size"</span>,</span>
+<span id="cb15-24"><a href="#cb15-24"></a>        <span class="bu">help</span><span class="op">=</span><span class="st">"Batch size for training (default: 4)"</span>,</span>
+<span id="cb15-25"><a href="#cb15-25"></a>    )</span>
+<span id="cb15-26"><a href="#cb15-26"></a>    args <span class="op">=</span> parser.parse_args()</span>
+<span id="cb15-27"><a href="#cb15-27"></a>    main(batch_size<span class="op">=</span>args.batch_size)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="example-batch-script" class="slide level2 smaller">
