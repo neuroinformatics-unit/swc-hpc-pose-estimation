@@ -18,7 +18,8 @@ format:
         auto-play-media: true
         code-overflow: wrap
         highlight-style: atom-one
-        embed-resources: true
+    html:
+      embed-resources: true
 ---
 
 ## Course materials {.smaller}
