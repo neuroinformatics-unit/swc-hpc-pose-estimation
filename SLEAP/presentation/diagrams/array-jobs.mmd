@@ -1,0 +1,10 @@
+%%{init: {"theme": "neutral", "fontFamily": "arial", "curve": "linear"} }%%
+
+flowchart LR
+    classDef emphasis fill:#03A062;
+
+    script["array script"] -->|"batch_size=2"| GPU1["GPU 1"] --> model1["Model 1"]
+    script -->|"batch_size=4"| GPU2GPU1["GPU 2"] --> model2["Model 1"]
+    script -->|"batch_size=8"| GPU3GPU1["GPU 3"] --> model3["Model 1"]
+
+    class script emphasis

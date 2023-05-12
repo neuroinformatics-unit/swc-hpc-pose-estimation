@@ -387,9 +387,6 @@
       margin-right: 0; 
     }
   </style>
-  <script src="presentation_files/libs/quarto-diagram/mermaid.min.js"></script>
-  <script src="presentation_files/libs/quarto-diagram/mermaid-init.js"></script>
-  <link href="presentation_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -851,7 +848,7 @@ Niko Sirmpilatze
 <div class="code-with-filename-file">
 <pre><strong>train_script_python.sbatch</strong></pre>
 </div>
-<div class="sourceCode" id="cb16" data-code-line-numbers="17-24"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">#!/bin/bash</span></span>
+<div class="sourceCode" id="cb16" data-code-line-numbers="17-23"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1"></a><span class="co">#!/bin/bash</span></span>
 <span id="cb16-2"><a href="#cb16-2"></a></span>
 <span id="cb16-3"><a href="#cb16-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
 <span id="cb16-4"><a href="#cb16-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
@@ -870,35 +867,59 @@ Niko Sirmpilatze
 <span id="cb16-17"><a href="#cb16-17"></a><span class="co"># Define directory for Python scripts</span></span>
 <span id="cb16-18"><a href="#cb16-18"></a><span class="va">DATA_DIR</span><span class="op">=</span>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
 <span id="cb16-19"><a href="#cb16-19"></a><span class="va">CODE_DIR</span><span class="op">=</span><span class="va">$DATA_DIR</span>/swc-hpc-pose-estimation/SLEAP/scripts</span>
-<span id="cb16-20"><a href="#cb16-20"></a><span class="co"># Go to the code directory</span></span>
-<span id="cb16-21"><a href="#cb16-21"></a><span class="bu">cd</span> <span class="va">$CODE_DIR</span></span>
-<span id="cb16-22"><a href="#cb16-22"></a></span>
-<span id="cb16-23"><a href="#cb16-23"></a><span class="co"># Run the Python script (for batch size 4)</span></span>
-<span id="cb16-24"><a href="#cb16-24"></a><span class="ex">python</span> <span class="va">$CODE_DIR</span>/run_sleap_training.py <span class="at">--batch-size</span> 4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-20"><a href="#cb16-20"></a><span class="bu">cd</span> <span class="va">$CODE_DIR</span></span>
+<span id="cb16-21"><a href="#cb16-21"></a></span>
+<span id="cb16-22"><a href="#cb16-22"></a><span class="co"># Run the Python script (for batch size 4)</span></span>
+<span id="cb16-23"><a href="#cb16-23"></a><span class="ex">python</span> run_sleap_training.py <span class="at">--batch-size</span> 4</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="submitting-array-batch-jobs" class="slide level2 smaller">
-<h2>Submitting array batch jobs</h2>
-<p>What if we want to run the same script for multiple batch sizes?</p>
-<p>This will allow us to see how the batch size affects the training.</p>
-<div class="cell" data-reveal="true">
-<div class="cell-output-display">
-<div>
-<div>
-<pre class="mermaid mermaid-js">%%{init: {"theme": "neutral", "fontFamily": "arial", "curve": "linear"} }%%
-
-flowchart LR
-    classDef emphasis fill:#03A062;
-
-    script --&gt;|"batch_size=1"| GPU1["GPU 1"] --&gt; model1["Model 1"]
-    script --&gt;|"batch_size=4"| GPU2GPU1["GPU 2"] --&gt; model2["Model 1"]
-    script --&gt;|"batch_size=8"| GPU3GPU1["GPU 3"] --&gt; model3["Model 1"]
-
-    class script emphasis
-</pre>
+<section id="array-jobs" class="slide level2 smaller">
+<h2>Array jobs</h2>
+<p>What if we want to run the previous script for multiple batch sizes?</p>
+<div class="fragment">
+<p><strong>Solution:</strong> submit an array job</p>
+<ul>
+<li>the jobs will run in parallel if there are enough resources</li>
+<li>otherwise, they will be scheduled to run sequentially</li>
+</ul>
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><img data-src="diagrams/array-jobs.svg" width="500"></p>
+</figure>
 </div>
 </div>
+</section>
+<section id="example-array-job" class="slide level2 smaller">
+<h2>Example array job</h2>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>train_script_python_array.sbatch</strong></pre>
 </div>
+<div class="sourceCode" id="cb17" data-code-line-numbers="8|13|23-25"><pre class="sourceCode numberSource bash number-lines code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a><span class="co">#SBATCH -p gpu # partition (queue)</span></span>
+<span id="cb17-4"><a href="#cb17-4"></a><span class="co">#SBATCH -N 1   # number of nodes</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a><span class="co">#SBATCH --mem 12G # memory pool for all cores</span></span>
+<span id="cb17-6"><a href="#cb17-6"></a><span class="co">#SBATCH -n 2 # number of cores</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a><span class="co">#SBATCH -t 0-04:00 # time (D-HH:MM)</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a><span class="co">#SBATCH --gres gpu:rtx2080:1 # request specific GPU type (rtx2080)</span></span>
+<span id="cb17-9"><a href="#cb17-9"></a><span class="co">#SBATCH -o slurm.%N.%j.out # STDOUT</span></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="co">#SBATCH -e slurm.%N.%j.err # STDERR</span></span>
+<span id="cb17-11"><a href="#cb17-11"></a><span class="co">#SBATCH --mail-type=ALL</span></span>
+<span id="cb17-12"><a href="#cb17-12"></a><span class="co">#SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk</span></span>
+<span id="cb17-13"><a href="#cb17-13"></a><span class="co">#SBATCH --array=1-3</span></span>
+<span id="cb17-14"><a href="#cb17-14"></a></span>
+<span id="cb17-15"><a href="#cb17-15"></a><span class="co"># Load the SLEAP module</span></span>
+<span id="cb17-16"><a href="#cb17-16"></a><span class="ex">module</span> load SLEAP</span>
+<span id="cb17-17"><a href="#cb17-17"></a></span>
+<span id="cb17-18"><a href="#cb17-18"></a><span class="co"># Define directory for Python scripts</span></span>
+<span id="cb17-19"><a href="#cb17-19"></a><span class="va">DATA_DIR</span><span class="op">=</span>/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data</span>
+<span id="cb17-20"><a href="#cb17-20"></a><span class="va">CODE_DIR</span><span class="op">=</span><span class="va">$DATA_DIR</span>/swc-hpc-pose-estimation/SLEAP/scripts</span>
+<span id="cb17-21"><a href="#cb17-21"></a><span class="bu">cd</span> <span class="va">$CODE_DIR</span></span>
+<span id="cb17-22"><a href="#cb17-22"></a></span>
+<span id="cb17-23"><a href="#cb17-23"></a><span class="co"># Run the Python script across batch sizes 2, 4, 8</span></span>
+<span id="cb17-24"><a href="#cb17-24"></a><span class="va">ARGS</span><span class="op">=</span><span class="va">(</span>2 4 8<span class="va">)</span></span>
+<span id="cb17-25"><a href="#cb17-25"></a><span class="ex">python</span> run_sleap_training.py <span class="at">--batch-size</span> <span class="st">"</span><span class="va">${ARGS</span><span class="op">[</span><span class="va">$SLURM_ARRAY_TASK_ID</span><span class="op">]</span><span class="va">}</span><span class="st">"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="useful-links" class="slide level2 smaller">

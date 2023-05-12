@@ -17,8 +17,7 @@ module load SLEAP
 # Define directory for Python scripts
 DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
 CODE_DIR=$DATA_DIR/swc-hpc-pose-estimation/SLEAP/scripts
-# Go to the code directory
 cd $CODE_DIR
 
 # Run the Python script (for batch size 4)
-python $CODE_DIR/run_sleap_training.py --batch-size 4
+python run_sleap_training.py --batch-size 4

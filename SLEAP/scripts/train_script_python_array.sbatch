@@ -5,7 +5,7 @@
 #SBATCH --mem 12G # memory pool for all cores
 #SBATCH -n 2 # number of cores
 #SBATCH -t 0-04:00 # time (D-HH:MM)
-#SBATCH --gres gpu:rtx2080:1 # request 1 GPU (rtx2080)
+#SBATCH --gres gpu:rtx2080:1 # request specific GPU type (rtx2080)
 #SBATCH -o slurm.%N.%j.out # STDOUT
 #SBATCH -e slurm.%N.%j.err # STDERR
 #SBATCH --mail-type=ALL
@@ -18,9 +18,8 @@ module load SLEAP
 # Define directory for Python scripts
 DATA_DIR=/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data
 CODE_DIR=$DATA_DIR/swc-hpc-pose-estimation/SLEAP/scripts
-# Go to the code directory
 cd $CODE_DIR
 
+# Run the Python script across batch sizes 2, 4, 8
 ARGS=(2 4 8)
-# Run the Python script (for batch size 4)
-python $CODE_DIR/run_sleap_training.py --batch-size "${ARGS[$SLURM_ARRAY_TASK_ID]}"
+python run_sleap_training.py --batch-size "${ARGS[$SLURM_ARRAY_TASK_ID]}"
