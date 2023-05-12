@@ -24,7 +24,7 @@ def main(batch_size=4):
     """
     training_job = SLEAPTrainer_TopDown_SingleInstance(
         train_dir=TEST_DATA_DIR / "labels.v002.slp.array_training",
-        labels_path=TEST_DATA_DIR / "labels.v002.slp",
+        labels_path=TEST_DATA_DIR / "labels.v002.slp.training_job/labels.v002.pkg.slp",
         skeleton_path=TEST_DATA_DIR / "skeleton.json",
         train_fraction=0.8,
         run_name_prefix=f"batch-size-{batch_size}",

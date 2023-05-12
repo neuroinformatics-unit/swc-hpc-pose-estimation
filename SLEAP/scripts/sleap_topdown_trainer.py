@@ -72,10 +72,11 @@ class SLEAPTrainer_TopDown_SingleInstance:
         self.cfg.data.instance_cropping.crop_size = 350
 
     def _split_labels(self):
-        """Load labels from a SLEAP project file, split into train/val/test sets,
+        """Load labels from an exported SLEAP training-job labels package, 
+        split into train/val/test sets,
         and save as separate SLEAP package files. The split files will be saved
         in the training job directory `train_dir`, with the split name appended
-        to the file name (e.g., "my_labels.slp" -> "my_labels.train.pkg.slp")
+        to the file name (e.g., "my_labels.pkg.slp" -> "my_labels.train.pkg.slp")
 
         Creates the following attribute:
         - `labels_split_paths`: dictionary with keys "train", "val", and "test"
@@ -91,7 +92,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         labels_split_paths = {}
         for split, labels in labels_split_data.items():
             labels_split_name = self.labels_path.name.replace(
-                ".slp", f".{split}.pkg.slp"
+                ".pkg.slp", f".{split}.pkg.slp"
             )
             labels_split_path = self.train_dir / labels_split_name
             labels.save(labels_split_path.as_posix(), with_images=True)
