@@ -10,7 +10,7 @@
 #SBATCH -e slurm.%N.%j.err # STDERR
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=n.sirmpilatze@ucl.ac.uk
-#SBATCH --array=1-3
+#SBATCH --array=0-2
 
 # Load the SLEAP module
 module load SLEAP
