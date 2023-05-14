@@ -54,7 +54,7 @@ $ ssh hpc-gw1
 ```
 SLEAP should be listed as one of the available modules:
 ```bash
-$ module avail -l
+$ module avail
 SLEAP/2023-03-13
 ```  
 Start an interactive job on a GPU node:
@@ -135,7 +135,7 @@ The rest of this guide assumes that you have mounted the SWC filesystem on your 
 We will also assume that the data you are working with are stored in a `ceph` or `winstor` directory to which you have access to. In the rest of this guide, we will use the path `/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data` which contains a SLEAP project for test purposes. You should replace this with the path to your own data.
 
 ## Model training
-This will consist of two parts - [preparing a training job](#prepare-the-training-job) (on your local SLEAP installation) and [running a training job](#run-the-training-job) (on the HPC cluster's SLEAP module). Some evaluation metrics for the trained models can be [viewed via the SLEAP GUI](#viewing-the-training-results) on your local SLEAP installation).
+This will consist of two parts - [preparing a training job](#prepare-the-training-job) (on your local SLEAP installation) and [running a training job](#run-the-training-job) (on the HPC cluster's SLEAP module). Some evaluation metrics for the trained models can be [viewed via the SLEAP GUI](#evaluate-the-trained-models) on your local SLEAP installation).
 
 ### Prepare the training job
 - Follow the SLEAP instructions for [Creating a Project](https://sleap.ai/tutorials/new-project.html) and [Initial Labelling](https://sleap.ai/tutorials/initial-labeling.html). Ensure that the project file (e.g. `labels.v001.slp`) is saved in the mounted SWC filesystem (as opposed to your local filesystem).
