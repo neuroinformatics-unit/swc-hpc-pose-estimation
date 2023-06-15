@@ -6,7 +6,7 @@ This guide explains how to test and use the [SLEAP](https://sleap.ai/) module th
   - [Table of contents](#table-of-contents)
   - [Abbreviations](#abbreviations)
   - [Prerequisites](#prerequisites)
-    - [Verify access to the HPC cluster and the SLEAP module](#verify-access-to-the-hpc-cluster-and-the-sleap-module)
+    - [Access to the HPC cluster and SLEAP module](#access-to-the-hpc-cluster-and-sleap-module)
     - [Install SLEAP on your local PC/laptop](#install-sleap-on-your-local-pclaptop)
     - [Mount the SWC filesystem on your local PC/laptop](#mount-the-swc-filesystem-on-your-local-pclaptop)
   - [Model training](#model-training)
@@ -15,6 +15,8 @@ This guide explains how to test and use the [SLEAP](https://sleap.ai/) module th
     - [Evaluate the trained models](#evaluate-the-trained-models)
   - [Model inference](#model-inference)
   - [The training-inference cycle](#the-training-inference-cycle)
+  - [Troubleshooting](#troubleshooting)
+    - [Problems with loading/using the SLEAP module](#problems-with-loadingusing-the-sleap-module)
 
 
 ## Abbreviations
@@ -46,94 +48,40 @@ This guide explains how to test and use the [SLEAP](https://sleap.ai/) module th
 
 ## Prerequisites
 
-### Verify access to the HPC cluster and the SLEAP module
-Log into the HPC login node (typing your `<SWC-PASSWORD>` both times when prompted):
+### Access to the HPC cluster and SLEAP module
+Verify that you can access HPC gateway node (typing your `<SWC-PASSWORD>` both times when prompted):
 ```bash
 $ ssh <SWC-USERNAME>@ssh.swc.ucl.ac.uk
 $ ssh hpc-gw1
 ```
-SLEAP should be listed as one of the available modules:
+If you are wondering about the two SSH commands, see the Appendix below.
+
+
+SLEAP should be listed among the available modules:
 ```bash
 $ module avail
+SLEAP/2023-06-15
 SLEAP/2023-03-13
-```  
-Start an interactive job on a GPU node:
+``` 
+
+`SLEAP/2023-03-13` corresponds to `sleap v.1.2.9` whereas `SLEAP/2023-06-15` is `v1.3.0`. We recommend using the latter.
+
+You can load the latest version by running:
+
 ```bash
-$ srun -p gpu --gres=gpu:1 --pty bash -i
-```
-[**SM**: maybe it would be nice to have an appendix explaining the different flags in all these commands, for people who want to learn more?]
+ $ module load SLEAP
+ ```
+If you want to load a specific version, you can do so by typing the full module name, including the date e.g. `module load SLEAP/2023-03-13`
 
-Load the SLEAP module. This might take some seconds, but it should finish without errors. Your terminal prompt may change as a result.
-```
-<SWC-USERNAME>@gpu-350-04:~$ module load SLEAP
-(sleap) <SWC-USERNAME>@gpu-350-04:~$
-```
-The hostname (the part between "@" and ":") will vary depending on which GPU node   you were assigned to.
-
-To verify that the module was loaded successfully:
+If a module has been successfully loaded, it will be listed when you run `module list`:
 ```bash
 $ module list
 Currently Loaded Modulefiles:
- 1) SLEAP/2023-03-13
-```
-The module is essentially a centrally installed conda environment. When it is loaded, you should be using particular executables for conda and Python. You can verify this by running:
-```bash
-$ which conda
-/ceph/apps/ubuntu-20/packages/SLEAP/2023-03-13/condabin/conda
-
-$ which python
-/nfs/nhome/live/<SWC-USERNAME>/.conda/envs/sleap/bin/python
+ 1) SLEAP/2023-06-15
 ```
 
-[**SM**: In my case I got different paths here, both for `which conda` and `which python`...]
+If you have troubles with loading the SLEAP module, see the [Troubleshooting section](#problems-with-loadingusing-the-sleap-module).
 
-
-
-Finally we will verify that the `sleap` python package can be imported and can "see" the GPU. We will just follow the [relevant SLEAP instructions](https://sleap.ai/installation.html#testing-that-things-are-working). First, start a Python interpreter:
-```bash
-$ python
-```
-Next, run the following Python commands (shown below with their expected outputs:
-```python
->>> import sleap
-
->>> sleap.versions()
-SLEAP: 1.2.9
-TensorFlow: 2.6.3
-Numpy: 1.19.5
-Python: 3.7.12
-OS: Linux-5.4.0-139-generic-x86_64-with-debian-bullseye-sid
-
->>> sleap.system_summary()
-GPUs: 1/1 available
-  Device: /physical_device:GPU:0
-         Available: True
-        Initalized: False
-     Memory growth: None 
-
->>> import tensorflow as tf 
-
->>> print(tf.config.list_physical_devices('GPU'))
-[PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
-```
-[**SM**: In my case I got a module not found error when importing sleap in the interactive node :( ]
-
-
-> **Warning**
-> 
-> The `import sleap` command may take some time to run (more than a minute).  This is normal. Subsequent imports should be faster.
-
-If all is as expected, you can exit the Python interpreter, and then exit the GPU node
-```python
->>> exit()
-$ exit
-```
-To completely exit the HPC cluster, you will need to logout of the SSH session  twice:
-[**SM**: maybe in the appendix explain why we need to do this twice?]
-```bash
-$ logout
-$ logout
-```
 
 ### Install SLEAP on your local PC/laptop
 While you can delegate the GPU-intensive work to the HPC cluster, you will still need to do some steps, such as labelling frames, on the SLEAP graphical user interface. Thus, you also need to install SLEAP on your local PC/laptop.
@@ -374,4 +322,85 @@ Now that you have some predictions, you can keep improving your models by repeat
 - Save the merged training set as`labels.v002.slp`
 - Export a new training job `labels.v002.slp.training_job` (you may reuse the training configurations from `v001`)
 - Repeat the training-inference cycle until satisfied
+
+## Troubleshooting
+
+### Problems with loading/using the SLEAP module
+
+In this section, we will describe how to test that the SLEAP module is loaded correctly for you and that it can see the GPU.
+
+Login to the HPC cluster as described [above](#access-to-the-hpc-cluster-and-sleap-module).
+
+Start an interactive job on a GPU node:
+```bash
+$ srun -p gpu --gres=gpu:1 --pty bash -i
+```
+[**SM**: maybe it would be nice to have an appendix explaining the different flags in all these commands, for people who want to learn more?]
+
+Load the SLEAP module. 
+```bash
+$ module load SLEAP
+```
+
+To verify that the module was loaded successfully:
+```bash
+$ module list
+Currently Loaded Modulefiles:
+ 1) SLEAP/2023-06-15
+```
+The module is essentially a centrally installed conda environment. When it is loaded, you should be using particular executables for conda and Python. You can verify this by running:
+```bash
+$ which conda
+/ceph/apps/ubuntu-20/packages/SLEAP/2023-06-15/bin/conda
+
+$ which python
+/ceph/apps/ubuntu-20/packages/SLEAP/2023-06-15/bin/python
+```
+
+Finally we will verify that the `sleap` python package can be imported and can "see" the GPU. We will just follow the [relevant SLEAP instructions](https://sleap.ai/installation.html#testing-that-things-are-working). First, start a Python interpreter:
+```bash
+$ python
+```
+Next, run the following Python commands (shown below with their expected outputs:
+```python
+>>> import sleap
+
+>>> sleap.versions()
+SLEAP: 1.2.9
+TensorFlow: 2.6.3
+Numpy: 1.19.5
+Python: 3.7.12
+OS: Linux-5.4.0-139-generic-x86_64-with-debian-bullseye-sid
+
+>>> sleap.system_summary()
+GPUs: 1/1 available
+  Device: /physical_device:GPU:0
+         Available: True
+        Initalized: False
+     Memory growth: None 
+
+>>> import tensorflow as tf 
+
+>>> print(tf.config.list_physical_devices('GPU'))
+[PhysicalDevice(name='/physical_device:GPU:0', device_type='GPU')]
+```
+[**SM**: In my case I got a module not found error when importing sleap in the interactive node :( ]
+
+
+> **Warning**
+> 
+> The `import sleap` command may take some time to run (more than a minute).  This is normal. Subsequent imports should be faster.
+
+If all is as expected, you can exit the Python interpreter, and then exit the GPU node
+```python
+>>> exit()
+$ exit
+```
+To completely exit the HPC cluster, you will need to logout of the SSH session  twice:
+[**SM**: maybe in the appendix explain why we need to do this twice?]
+```bash
+$ logout
+$ logout
+```
+
 
