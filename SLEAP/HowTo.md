@@ -510,8 +510,7 @@ We first need to distinguish the different types of nodes on the SWC HPC system:
 - the *gateway* node - `hpc-gw1`. This is a more powerful machine and can be used for light processing, such as editing your scripts, creating and copying files etc. However don't use it for anything computationally intensive, since this node's resources are shared across all users.
 - the *compute* nodes - `enc1-node10`, `gpu-sr670-21`, etc. These are the machinces that actually run the jobs we submit, either interactively via `srun` or via batch scripts submitted with `sbatch`.
 
-[![](https://mermaid.ink/img/pako:eNp9Uk2LwjAQ_SshULqCFdRbD8viLnhRD5Y9LOQypqMNtknJxxap_e87tQrWw-aSTN68mTcfLZcmR57yKGqVVj5lbewLrDBOY43BWyjjrosioY-laWQB1rPNXmihGZ3N2xHSIyQl1N7U7McEy7YgC6WRTViSvF8Fd65ggtyDQ_tBxsw1chZkOQO6zoJf2eoehRx-0bIVOK-MngwpVi9hilomp2be89Zj3ho8NnB55dmgb0R3AC-Lnpe1A0-jb4w9J42ymLNs873fdgN5_Q_5UbsLh5OFmlTxT1PVwSPbUSud4APen918LHE-ecIWY2zxjC3H2O6Ooc4f6bNeIiUYWYuRtRSaT3mFtgKV04jbHhX8Nl7BU3reJ9xL7sgVgjfZRUueehtwykOdU0-_FFChFSc9paNfzJU3djuszW17uj-fELZE?type=png)](https://mermaid.live/edit#pako:eNp9Uk2LwjAQ_SshULqCFdRbD8viLnhRD5Y9LOQypqMNtknJxxap_e87tQrWw-aSTN68mTcfLZcmR57yKGqVVj5lbewLrDBOY43BWyjjrosioY-laWQB1rPNXmihGZ3N2xHSIyQl1N7U7McEy7YgC6WRTViSvF8Fd65ggtyDQ_tBxsw1chZkOQO6zoJf2eoehRx-0bIVOK-MngwpVi9hilomp2be89Zj3ho8NnB55dmgb0R3AC-Lnpe1A0-jb4w9J42ymLNs873fdgN5_Q_5UbsLh5OFmlTxT1PVwSPbUSud4APen918LHE-ecIWY2zxjC3H2O6Ooc4f6bNeIiUYWYuRtRSaT3mFtgKV04jbHhX8Nl7BU3reJ9xL7sgVgjfZRUueehtwykOdU0-_FFChFSc9paNfzJU3djuszW17uj-fELZE)
-
+![](../img/swc_hpc_access_flowchart.png)
 
 The home directory, as well as the locations where filesystems like `ceph` are mounted, are shared across all of the nodes.
 
