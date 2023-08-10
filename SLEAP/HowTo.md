@@ -328,7 +328,7 @@ You can use the SLEAP GUI on your local machine to load and view the predictions
 Now that you have some predictions, you can keep improving your models by repeating the training-inference cycle. The basic steps are:
 - Manually correct some of the predictions: see [Prediction-assisted labeling](https://sleap.ai/tutorials/assisted-labeling.html)
 - Merge corrected labels into the initial training set: see [Merging guide](https://sleap.ai/guides/merging.html)
-- Save the merged training set as`labels.v002.slp`
+- Save the merged training set as `labels.v002.slp`
 - Export a new training job `labels.v002.slp.training_job` (you may reuse the training configurations from `v001`)
 - Repeat the training-inference cycle until satisfied
 
@@ -509,6 +509,26 @@ We first need to distinguish the different types of nodes on the SWC HPC system:
 - the *bastion* node (or "jump host") - `ssh.swc.ucl.ac.uk`. This serves as a single entry point to the cluster from external networks. By funneling all external SSH connections through this node, it's easier to monitor, log, and control access, reducing the attack surface. The *bastion* node has very little processing power. It can be used to submit and monitor SLURM jobs, but it shouldn't be used for anything else.
 - the *gateway* node - `hpc-gw1`. This is a more powerful machine and can be used for light processing, such as editing your scripts, creating and copying files etc. However don't use it for anything computationally intensive, since this node's resources are shared across all users.
 - the *compute* nodes - `enc1-node10`, `gpu-sr670-21`, etc. These are the machinces that actually run the jobs we submit, either interactively via `srun` or via batch scripts submitted with `sbatch`.
+
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+
+    L(fa:fa-laptop Your Machine ) -->|"ssh \n user@ssh.swc.ucl.ac.uk"| B(fa:fa-server Bastion)
+    B -->|"ssh \n hpc-gw1"| G(fa:fa-server Gateway)
+    B -->|"srun \n sbatch"| S{fa:fa-network-wired SLURM}
+    G -->|"srun \n sbatch"| S
+
+    subgraph "Compute Nodes"
+        N1(fa:fa-server 1)
+        N2(fa:fa-server 2)
+        N3(fa:fa-server N)
+    end
+
+    S --> N1
+    S --> N2
+    S --> N3
+```
 
 
 The home directory, as well as the locations where filesystems like `ceph` are mounted, are shared across all of the nodes.
