@@ -1,14 +1,10 @@
-import copy
-import sleap
 from pathlib import Path
 from typing import Optional
 
-from sleap.nn.config import (
-    TrainingJobConfig,
-    UNetConfig,
-    CentroidsHeadConfig,
-    CenteredInstanceConfmapsHeadConfig,
-)
+import sleap
+from sleap.nn.config import (CenteredInstanceConfmapsHeadConfig,
+                             CentroidsHeadConfig, TrainingJobConfig,
+                             UNetConfig)
 from sleap.nn.training import Trainer
 
 
@@ -70,7 +66,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         self.cfg.data.preprocessing.ensure_grayscale = True
         self.cfg.data.instance_cropping.center_on_part = anchor_part
         self.cfg.data.instance_cropping.crop_size_detection_padding = 32
-        self.cfg.data.instance_cropping.crop_size = 350         
+        self.cfg.data.instance_cropping.crop_size = 350
 
     def _split_labels(self):
         """Load labels from an exported SLEAP training-job labels package,
@@ -158,7 +154,7 @@ class SLEAPTrainer_TopDown_SingleInstance:
         self.cfg.data.preprocessing.input_scaling = input_scaling
         self.cfg.optimization.epochs = n_epochs
         self.cfg.optimization.batch_size = batch_size
-        
+
         if self.model_type == "centroid":
             self.cfg.outputs.run_name_suffix = ".centroid"
             self.cfg.model.backbone.unet = UNetConfig(
@@ -185,16 +181,14 @@ class SLEAPTrainer_TopDown_SingleInstance:
                 output_stride=4,
                 up_interpolate=True,
             )
-            self.cfg.model.heads.centered_instance = (
-                CenteredInstanceConfmapsHeadConfig(
-                    anchor_part=self.anchor_part,
-                    sigma=2.5,
-                    output_stride=4,
-                    loss_weight=1.0,
-                )
+            self.cfg.model.heads.centered_instance = CenteredInstanceConfmapsHeadConfig(
+                anchor_part=self.anchor_part,
+                sigma=2.5,
+                output_stride=4,
+                loss_weight=1.0,
             )
             self.cfg.model.heads.centroid = None
-        
+
         else:
             raise ValueError(
                 "model_type must be one of 'centroid' or 'centered_instance'."

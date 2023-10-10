@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+
 from sleap_topdown_trainer import SLEAPTrainer_TopDown_SingleInstance
 
 TEST_DATA_DIR = Path("/ceph/scratch/neuroinformatics-dropoff/SLEAP_HPC_test_data")
